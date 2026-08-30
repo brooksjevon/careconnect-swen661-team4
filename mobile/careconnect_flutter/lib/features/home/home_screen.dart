@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/care_theme_option.dart';
+import '../../app/theme/care_theme_tokens.dart';
+import '../../app/theme/theme_preview_asset.dart';
+import '../reminders/schedule_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final CareThemeOption selectedTheme;
@@ -24,16 +27,18 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               _showThemeSelector(context);
             },
+            style: TextButton.styleFrom(foregroundColor: Colors.white),
             icon: const Icon(Icons.palette_outlined),
             label: const Text('Theme'),
           ),
           const SizedBox(width: AppSpacing.xs),
-          TextButton.icon(
+          IconButton(
             onPressed: () {
               _showHelpMessage(context);
             },
+            color: Colors.white,
             icon: const Icon(Icons.support_agent_outlined),
-            label: const Text('Help'),
+            tooltip: 'Help',
           ),
           const SizedBox(width: AppSpacing.sm),
         ],
@@ -42,27 +47,51 @@ class HomeScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.base),
           children: [
-            Text(
-              'Good morning, Linda',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Here is what needs your attention today.',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
+            _buildThemeHero(context),
+
             const SizedBox(height: AppSpacing.xl),
+
             _sectionHeading(context, 'Next Important Action'),
+
             const SizedBox(height: AppSpacing.md),
+
             _buildNextActionCard(context),
+
             const SizedBox(height: AppSpacing.xl),
+
             _sectionHeading(context, 'Today'),
+
             const SizedBox(height: AppSpacing.md),
+
             _buildAppointmentCard(context),
+
             const SizedBox(height: AppSpacing.md),
+
             _buildCareTaskCard(context),
-            const SizedBox(height: AppSpacing.xl),
+
+            const SizedBox(height: AppSpacing.md),
+
             _buildReminderCard(context),
+
+            const SizedBox(height: AppSpacing.md),
+
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) {
+                        return const ScheduleScreen();
+                      },
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.calendar_view_day_outlined),
+                label: const Text('View Schedule'),
+              ),
+            ),
+
             const SizedBox(height: AppSpacing.xl),
           ],
         ),
@@ -70,44 +99,151 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildThemeHero(BuildContext context) {
+    final tokens = Theme.of(context).extension<CareThemeTokens>()!;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: tokens.softSurface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: tokens.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AspectRatio(
+            aspectRatio: 2,
+            child: SvgPicture.asset(
+              ThemePreviewAsset.forTheme(selectedTheme),
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.base),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Good morning, Linda',
+                  style: Theme.of(context).textTheme.headlineLarge,
+                ),
+
+                const SizedBox(height: AppSpacing.sm),
+
+                Text(
+                  'Here is what needs your attention today.',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+
+                const SizedBox(height: AppSpacing.md),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: tokens.accent.withValues(alpha: 0.20),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    '${_themeName(selectedTheme)} theme',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _themeName(CareThemeOption theme) {
+    switch (theme) {
+      case CareThemeOption.neutral:
+        return 'Neutral';
+
+      case CareThemeOption.blueGreen:
+        return 'Blue & Green';
+
+      case CareThemeOption.purplePink:
+        return 'Purple & Pink';
+
+      case CareThemeOption.kids:
+        return 'Kids';
+    }
+  }
+
   Widget _sectionHeading(BuildContext context, String title) {
     return Text(title, style: Theme.of(context).textTheme.headlineMedium);
   }
 
   Widget _buildNextActionCard(BuildContext context) {
+    final tokens = Theme.of(context).extension<CareThemeTokens>()!;
+
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.base),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.25)),
+        color: tokens.softSurface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: tokens.decorativeAccent.withValues(alpha: 0.50),
+          width: 1.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.medication_outlined,
-                color: colorScheme.primary,
-                size: 32,
-                semanticLabel: 'Medication',
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: tokens.accent.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.medication_outlined,
+                  color: colorScheme.primary,
+                  semanticLabel: 'Medication',
+                ),
               ),
-              const SizedBox(width: AppSpacing.sm),
-              Text('Medication', style: Theme.of(context).textTheme.titleLarge),
+
+              const SizedBox(width: AppSpacing.md),
+
+              Expanded(
+                child: Text(
+                  'Medication',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
             ],
           ),
+
           const SizedBox(height: AppSpacing.lg),
+
           Text('Lisinopril', style: Theme.of(context).textTheme.headlineMedium),
+
           const SizedBox(height: AppSpacing.xs),
+
           Text('10 mg', style: Theme.of(context).textTheme.bodyLarge),
+
           const SizedBox(height: AppSpacing.base),
+
           _informationRow(context, label: 'Take', value: '1 tablet'),
+
           const SizedBox(height: AppSpacing.sm),
+
           _informationRow(context, label: 'When', value: 'Once each day'),
+
           const SizedBox(height: AppSpacing.lg),
+
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
@@ -196,9 +332,11 @@ class HomeScreen extends StatelessWidget {
                         semanticLabel: 'Complete',
                       ),
                       const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        'Status: Complete',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      Expanded(
+                        child: Text(
+                          'Status: Complete',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ),
                     ],
                   ),
@@ -279,21 +417,20 @@ class HomeScreen extends StatelessWidget {
                   'Choose Your Theme',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
+
                 const SizedBox(height: AppSpacing.sm),
+
                 Text(
                   'Choose the appearance that works best for you.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
+
                 const SizedBox(height: AppSpacing.lg),
 
                 _ThemeOptionTile(
-                  title: 'Neutral',
+                  label: 'Neutral',
+                  theme: CareThemeOption.neutral,
                   selected: selectedTheme == CareThemeOption.neutral,
-                  colors: const [
-                    AppColors.neutralPrimary,
-                    AppColors.neutralSecondary,
-                    AppColors.neutralSoftSurface,
-                  ],
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
                     onThemeChanged(CareThemeOption.neutral);
@@ -301,13 +438,9 @@ class HomeScreen extends StatelessWidget {
                 ),
 
                 _ThemeOptionTile(
-                  title: 'Blue & Green',
+                  label: 'Blue & Green',
+                  theme: CareThemeOption.blueGreen,
                   selected: selectedTheme == CareThemeOption.blueGreen,
-                  colors: const [
-                    AppColors.blueGreenPrimary,
-                    AppColors.blueGreenSecondary,
-                    AppColors.blueGreenAccent,
-                  ],
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
                     onThemeChanged(CareThemeOption.blueGreen);
@@ -315,13 +448,9 @@ class HomeScreen extends StatelessWidget {
                 ),
 
                 _ThemeOptionTile(
-                  title: 'Purple & Pink',
+                  label: 'Purple & Pink',
+                  theme: CareThemeOption.purplePink,
                   selected: selectedTheme == CareThemeOption.purplePink,
-                  colors: const [
-                    AppColors.purplePinkPrimary,
-                    AppColors.purplePinkSecondary,
-                    AppColors.purplePinkAccent,
-                  ],
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
                     onThemeChanged(CareThemeOption.purplePink);
@@ -329,14 +458,9 @@ class HomeScreen extends StatelessWidget {
                 ),
 
                 _ThemeOptionTile(
-                  title: 'Kids',
+                  label: 'Kids',
+                  theme: CareThemeOption.kids,
                   selected: selectedTheme == CareThemeOption.kids,
-                  colors: const [
-                    AppColors.kidsPrimary,
-                    AppColors.kidsSecondary,
-                    AppColors.kidsYellow,
-                    AppColors.kidsCoral,
-                  ],
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
                     onThemeChanged(CareThemeOption.kids);
@@ -360,15 +484,15 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _ThemeOptionTile extends StatelessWidget {
-  final String title;
+  final String label;
+  final CareThemeOption theme;
   final bool selected;
-  final List<Color> colors;
   final VoidCallback onTap;
 
   const _ThemeOptionTile({
-    required this.title,
+    required this.label,
+    required this.theme,
     required this.selected,
-    required this.colors,
     required this.onTap,
   });
 
@@ -377,34 +501,31 @@ class _ThemeOptionTile extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
-      label: '$title theme',
+      label: '$label theme',
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        minVerticalPadding: AppSpacing.sm,
+        contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         onTap: onTap,
-        title: Text(title),
-        leading: Wrap(
-          spacing: 3,
-          children: colors
-              .map(
-                (color) => Container(
-                  width: 18,
-                  height: 18,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.border),
-                  ),
-                ),
-              )
-              .toList(),
+
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: SvgPicture.asset(
+            ThemePreviewAsset.forTheme(theme),
+            width: 82,
+            height: 48,
+            fit: BoxFit.cover,
+          ),
         ),
+
+        title: Text(label, style: Theme.of(context).textTheme.titleLarge),
+
         trailing: selected
             ? Icon(
                 Icons.check_circle,
                 color: Theme.of(context).colorScheme.primary,
                 semanticLabel: 'Selected',
               )
-            : null,
+            : const Icon(Icons.circle_outlined, semanticLabel: 'Not selected'),
       ),
     );
   }

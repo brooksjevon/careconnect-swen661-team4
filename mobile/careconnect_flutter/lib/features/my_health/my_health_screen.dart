@@ -1,9 +1,41 @@
 import 'package:flutter/material.dart';
 
+import '../../app/accessibility/accessibility_preferences.dart';
 import '../../app/theme/app_spacing.dart';
+import '../../app/theme/care_theme_option.dart';
+import 'screens/accessibility_appearance_screen.dart';
 
 class MyHealthScreen extends StatelessWidget {
-  const MyHealthScreen({super.key});
+  final CareThemeOption selectedTheme;
+
+  final ValueChanged<CareThemeOption> onThemeChanged;
+
+  final AccessibilityPreferences preferences;
+
+  final ValueChanged<AccessibilityPreferences> onPreferencesChanged;
+
+  const MyHealthScreen({
+    super.key,
+    required this.selectedTheme,
+    required this.onThemeChanged,
+    required this.preferences,
+    required this.onPreferencesChanged,
+  });
+
+  void openAccessibility(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) {
+          return AccessibilityAppearanceScreen(
+            selectedTheme: selectedTheme,
+            onThemeChanged: onThemeChanged,
+            preferences: preferences,
+            onPreferencesChanged: onPreferencesChanged,
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +85,9 @@ class MyHealthScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  openAccessibility(context);
+                },
                 icon: const Icon(Icons.accessibility_new),
                 label: const Text('Accessibility & Appearance'),
               ),

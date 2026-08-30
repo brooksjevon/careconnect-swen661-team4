@@ -1,9 +1,33 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_spacing.dart';
+import 'screens/care_instructions_screen.dart';
 
-class CarePlanScreen extends StatelessWidget {
+class CarePlanScreen extends StatefulWidget {
   const CarePlanScreen({super.key});
+
+  @override
+  State<CarePlanScreen> createState() => _CarePlanScreenState();
+}
+
+class _CarePlanScreenState extends State<CarePlanScreen> {
+  bool careInstructionsComplete = false;
+
+  Future<void> openCareInstructions() async {
+    final completed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (context) {
+          return const CareInstructionsScreen();
+        },
+      ),
+    );
+
+    if (completed == true && mounted) {
+      setState(() {
+        careInstructionsComplete = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +49,26 @@ class CarePlanScreen extends StatelessWidget {
               number: '1',
               title: 'Morning medication',
               status: 'Complete',
+              supportingText: 'Your morning medication is complete.',
               icon: Icons.check_circle_outline,
             ),
 
             const SizedBox(height: AppSpacing.md),
 
-            const _CareTask(
+            _CareTask(
               number: '2',
               title: 'Drink water',
-              status: 'Next',
-              icon: Icons.arrow_forward,
+              status: careInstructionsComplete ? 'Complete' : 'Next',
+              supportingText: careInstructionsComplete
+                  ? 'Care instructions complete.'
+                  : 'Open the instructions to follow this task step by step.',
+              icon: careInstructionsComplete
+                  ? Icons.check_circle_outline
+                  : Icons.arrow_forward,
+              actionLabel: careInstructionsComplete
+                  ? 'Review Instructions'
+                  : 'View Instructions',
+              onAction: openCareInstructions,
             ),
 
             const SizedBox(height: AppSpacing.md),
@@ -43,6 +77,7 @@ class CarePlanScreen extends StatelessWidget {
               number: '3',
               title: 'Check blood pressure',
               status: 'Later',
+              supportingText: 'Complete this task later today.',
               icon: Icons.schedule,
             ),
           ],
@@ -56,13 +91,19 @@ class _CareTask extends StatelessWidget {
   final String number;
   final String title;
   final String status;
+  final String supportingText;
   final IconData icon;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   const _CareTask({
     required this.number,
     required this.title,
     required this.status,
+    required this.supportingText,
     required this.icon,
+    this.actionLabel,
+    this.onAction,
   });
 
   @override
@@ -71,6 +112,7 @@ class _CareTask extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.base),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(child: Text(number)),
             const SizedBox(width: AppSpacing.base),
@@ -92,6 +134,22 @@ class _CareTask extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    supportingText,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  if (actionLabel != null && onAction != null) ...[
+                    const SizedBox(height: AppSpacing.base),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: onAction,
+                        icon: const Icon(Icons.arrow_forward),
+                        label: Text(actionLabel!),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -45,9 +45,7 @@ void main() {
 
     expect(navigationBarFinder, findsOneWidget);
 
-    final NavigationBar navigationBar = tester.widget<NavigationBar>(
-      navigationBarFinder,
-    );
+    final navigationBar = tester.widget<NavigationBar>(navigationBarFinder);
 
     expect(navigationBar.destinations.length, 5);
 
@@ -87,7 +85,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    final NavigationBar updatedNavigationBar = tester.widget<NavigationBar>(
+    final updatedNavigationBar = tester.widget<NavigationBar>(
       navigationBarFinder,
     );
 
@@ -95,7 +93,9 @@ void main() {
 
     expect(find.text('Your current medication schedule.'), findsOneWidget);
 
-    expect(find.text('High blood pressure'), findsOneWidget);
+    expect(find.text('Amlodipine'), findsOneWidget);
+
+    expect(find.text('View Details'), findsNWidgets(2));
   });
 
   testWidgets('Theme selector remains available', (WidgetTester tester) async {

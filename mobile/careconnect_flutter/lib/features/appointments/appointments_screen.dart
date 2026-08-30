@@ -1,9 +1,33 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_spacing.dart';
+import 'screens/appointment_preparation_screen.dart';
 
-class AppointmentsScreen extends StatelessWidget {
+class AppointmentsScreen extends StatefulWidget {
   const AppointmentsScreen({super.key});
+
+  @override
+  State<AppointmentsScreen> createState() => _AppointmentsScreenState();
+}
+
+class _AppointmentsScreenState extends State<AppointmentsScreen> {
+  bool preparationComplete = false;
+
+  Future<void> openPreparation() async {
+    final completed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (context) {
+          return const AppointmentPreparationScreen();
+        },
+      ),
+    );
+
+    if (completed == true && mounted) {
+      setState(() {
+        preparationComplete = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +60,11 @@ class AppointmentsScreen extends StatelessWidget {
                           semanticLabel: 'Appointment',
                         ),
                         const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          'Dr. Patel',
-                          style: Theme.of(context).textTheme.titleLarge,
+                        Expanded(
+                          child: Text(
+                            'Dr. Patel',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
                         ),
                       ],
                     ),
@@ -55,6 +81,41 @@ class AppointmentsScreen extends StatelessWidget {
                     Text(
                       'Purpose: Blood pressure follow-up',
                       style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.base),
+                    Row(
+                      children: [
+                        Icon(
+                          preparationComplete
+                              ? Icons.check_circle_outline
+                              : Icons.schedule_outlined,
+                          semanticLabel: preparationComplete
+                              ? 'Preparation complete'
+                              : 'Preparation not complete',
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(
+                            preparationComplete
+                                ? 'Preparation: Complete'
+                                : 'Preparation: Not complete',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.base),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: openPreparation,
+                        icon: const Icon(Icons.assignment_outlined),
+                        label: Text(
+                          preparationComplete
+                              ? 'Review Preparation'
+                              : 'Prepare for Appointment',
+                        ),
+                      ),
                     ),
                   ],
                 ),

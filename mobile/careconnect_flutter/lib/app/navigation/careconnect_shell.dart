@@ -5,16 +5,23 @@ import '../../features/care_plan/care_plan_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/medications/medications_screen.dart';
 import '../../features/my_health/my_health_screen.dart';
+import '../accessibility/accessibility_preferences.dart';
 import '../theme/care_theme_option.dart';
 
 class CareConnectShell extends StatefulWidget {
   final CareThemeOption selectedTheme;
   final ValueChanged<CareThemeOption> onThemeChanged;
 
+  final AccessibilityPreferences preferences;
+
+  final ValueChanged<AccessibilityPreferences> onPreferencesChanged;
+
   const CareConnectShell({
     super.key,
     required this.selectedTheme,
     required this.onThemeChanged,
+    required this.preferences,
+    required this.onPreferencesChanged,
   });
 
   @override
@@ -33,7 +40,12 @@ class _CareConnectShellState extends State<CareConnectShell> {
       const MedicationsScreen(),
       const AppointmentsScreen(),
       const CarePlanScreen(),
-      const MyHealthScreen(),
+      MyHealthScreen(
+        selectedTheme: widget.selectedTheme,
+        onThemeChanged: widget.onThemeChanged,
+        preferences: widget.preferences,
+        onPreferencesChanged: widget.onPreferencesChanged,
+      ),
     ];
   }
 
@@ -47,7 +59,7 @@ class _CareConnectShellState extends State<CareConnectShell> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final bool useNavigationRail = constraints.maxWidth >= 600;
+        final useNavigationRail = constraints.maxWidth >= 600;
 
         if (useNavigationRail) {
           return _buildTabletLayout();
