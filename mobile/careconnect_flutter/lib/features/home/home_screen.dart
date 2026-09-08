@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+
+import '../../app/auth/role_scope.dart';
+import '../auth/screens/sign_in_screen.dart';
+import 'widgets/role_dashboard_header.dart';
+
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/care_theme_option.dart';
 import '../../app/theme/care_theme_tokens.dart';
 import '../../app/theme/theme_preview_asset.dart';
+import '../../app/theme/theme_photo_asset.dart';
 import '../reminders/schedule_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -114,9 +120,16 @@ class HomeScreen extends StatelessWidget {
         children: [
           AspectRatio(
             aspectRatio: 2,
-            child: SvgPicture.asset(
-              ThemePreviewAsset.forTheme(selectedTheme),
+            child: Image.asset(
+              ThemePhotoAsset.forTheme(selectedTheme),
+              width: double.infinity,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return SvgPicture.asset(
+                  ThemePreviewAsset.forTheme(selectedTheme),
+                  fit: BoxFit.cover,
+                );
+              },
             ),
           ),
 
@@ -125,33 +138,11 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Good morning, Linda',
-                  style: Theme.of(context).textTheme.headlineLarge,
-                ),
-
-                const SizedBox(height: AppSpacing.sm),
-
-                Text(
-                  'Here is what needs your attention today.',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-
-                const SizedBox(height: AppSpacing.md),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: tokens.accent.withValues(alpha: 0.20),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    '${_themeName(selectedTheme)} theme',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                RoleDashboardHeader(
+                  role:
+                      RoleScope.maybeOf(context)?.role ??
+                      CareConnectRole.patient,
+                  onSwitchUser: RoleScope.maybeOf(context)?.onSignOut ?? () {},
                 ),
               ],
             ),
@@ -159,22 +150,6 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _themeName(CareThemeOption theme) {
-    switch (theme) {
-      case CareThemeOption.neutral:
-        return 'Neutral';
-
-      case CareThemeOption.blueGreen:
-        return 'Blue & Green';
-
-      case CareThemeOption.purplePink:
-        return 'Purple & Pink';
-
-      case CareThemeOption.kids:
-        return 'Kids';
-    }
   }
 
   Widget _sectionHeading(BuildContext context, String title) {
