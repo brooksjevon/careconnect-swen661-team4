@@ -70,7 +70,7 @@ flutter test --coverage
 The current test suite contains **22 passing tests**, consisting of:
 
 - **17 widget tests** covering UI behavior and application workflows
-- **5 unit tests** covering the Medication data model and `copyWith()` behavior
+- **26 unit tests** covering data models, business logic, accessibility preferences, calculations, role state-change logic, and theme state logic
 
 Test files include:
 
@@ -80,6 +80,7 @@ Test files include:
 - `care_instructions_test.dart`
 - `medication_workflow_test.dart`
 - `unit/medication_model_test.dart`
+- `unit/business_logic_test.dart`
 
 ---
 
@@ -98,7 +99,7 @@ Open the generated report on macOS:
 open coverage/html/index.html
 ```
 
-The Week 4 test suite achieved **79.6% line coverage (836 of 1,050 lines)**, exceeding the required minimum of 60%.
+The Week 4 test suite achieved **81.5% line coverage (856 of 1,050 lines)**, exceeding the required minimum of 60%.
 
 The generated coverage report is included under:
 
