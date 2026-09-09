@@ -31,6 +31,10 @@ analysis_benchmark.json
 # packages file containing multi-root paths
 .packages.generated
 
+# Node.js dependencies
+node_modules/
+**/node_modules/
+
 # Flutter/Dart/Pub related
 **/doc/api/
 .dart_tool/
@@ -93,6 +97,8 @@ unlinked_spec.ds
 **/macos/Flutter/GeneratedPluginRegistrant.swift
 **/macos/Flutter/ephemeral
 **/xcuserdata/
+.DS_Store
+**/.DS_Store
 
 # Windows
 **/windows/flutter/generated_plugin_registrant.cc
