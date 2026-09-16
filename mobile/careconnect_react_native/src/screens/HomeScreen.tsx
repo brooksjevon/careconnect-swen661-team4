@@ -1,15 +1,15 @@
 ﻿import React from 'react';
 import {
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AccessibleCard } from '../components/AccessibleCard';
+import { ReadAloudButton } from '../components/ReadAloudButton';
+import { ThemedScreen } from '../components/ThemedScreen';
 import { useCareConnect } from '../context/AppContext';
 import {
   appointments,
@@ -69,164 +69,157 @@ export function HomeScreen() {
   const appointment = appointments[0];
   const careTask = careTasks[0];
 
+  const heroReadText = `${roleTitle(role)}. ${roleSubtitle(
+    role,
+  )} Signed in as ${role ? roleLabels[role] : 'Patient'}.`;
+
   return (
-    <SafeAreaView
-      style={[
-        styles.safeArea,
-        { backgroundColor: activeTheme.background },
-      ]}
-    >
-      <ScrollView contentContainerStyle={styles.content}>
-        <View
+    <ThemedScreen backgroundVariant="home">
+      <View
+        style={[
+          styles.hero,
+          {
+            backgroundColor: activeTheme.softSurface,
+            borderColor: activeTheme.border,
+          },
+        ]}
+      >
+        <Text
+          accessibilityRole="header"
           style={[
-            styles.hero,
+            styles.heroTitle,
             {
-              backgroundColor: activeTheme.softSurface,
-              borderColor: activeTheme.border,
+              color: activeTheme.primary,
+              fontSize: typography.screenTitle * textScale,
             },
           ]}
         >
+          {roleTitle(role)}
+        </Text>
+
+        <Text
+          style={[
+            styles.heroText,
+            {
+              color: activeTheme.text,
+              fontSize: typography.body * textScale,
+            },
+          ]}
+        >
+          {roleSubtitle(role)}
+        </Text>
+
+        <Text
+          style={[
+            styles.roleText,
+            {
+              color: activeTheme.mutedText,
+              fontSize: typography.bodySmall * textScale,
+            },
+          ]}
+        >
+          Signed in as {role ? roleLabels[role] : 'Patient'}
+        </Text>
+
+        <ReadAloudButton text={heroReadText} label="Read Dashboard Aloud" />
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Switch user"
+          onPress={signOut}
+          style={[
+            styles.secondaryButton,
+            { borderColor: activeTheme.primary },
+          ]}
+        >
           <Text
-            accessibilityRole="header"
             style={[
-              styles.heroTitle,
-              {
-                color: activeTheme.primary,
-                fontSize: typography.screenTitle * textScale,
-              },
+              styles.secondaryButtonText,
+              { color: activeTheme.primary },
             ]}
           >
-            {roleTitle(role)}
+            Switch User
           </Text>
+        </Pressable>
+      </View>
 
-          <Text
-            style={[
-              styles.heroText,
-              {
-                color: activeTheme.text,
-                fontSize: typography.body * textScale,
-              },
-            ]}
-          >
-            {roleSubtitle(role)}
-          </Text>
+      <View style={isTablet ? styles.gridTablet : undefined}>
+        <AccessibleCard
+          title="Next Important Action"
+          description={`${medication.name} ${medication.dose}. ${medication.take}. ${medication.when}.`}
+        />
 
-          <Text
-            style={[
-              styles.roleText,
-              {
-                color: activeTheme.mutedText,
-                fontSize: typography.bodySmall * textScale,
-              },
-            ]}
-          >
-            Signed in as {role ? roleLabels[role] : 'Patient'}
-          </Text>
+        <AccessibleCard
+          title="Appointment"
+          description={`${appointment.provider}. ${appointment.date} at ${appointment.time}. ${appointment.reason}.`}
+        />
 
+        <AccessibleCard
+          title="Care Task"
+          description={`${careTask.title}. Start with step 1: ${careTask.instructions[0]}`}
+        />
+
+        <AccessibleCard
+          title="Care Team"
+          description={`Caregiver: ${caregiverName}. Provider: ${providerName}.`}
+        />
+      </View>
+
+      <Text
+        style={[
+          styles.sectionTitle,
+          {
+            color: activeTheme.text,
+            fontSize: typography.sectionTitle * textScale,
+          },
+        ]}
+      >
+        Theme
+      </Text>
+
+      {Object.entries(themes).map(([themeKey, themeValue]) => {
+        const key = themeKey as ThemeOption;
+        const selected = selectedTheme === key;
+
+        return (
           <Pressable
+            key={key}
             accessibilityRole="button"
-            accessibilityLabel="Switch user"
-            onPress={signOut}
+            accessibilityState={{ selected }}
+            accessibilityLabel={`${themeValue.name} theme`}
+            onPress={() => setSelectedTheme(key)}
             style={[
-              styles.secondaryButton,
-              { borderColor: activeTheme.primary },
+              styles.themeButton,
+              {
+                backgroundColor: selected
+                  ? themeValue.softSurface
+                  : activeTheme.surface,
+                borderColor: selected
+                  ? themeValue.primary
+                  : activeTheme.border,
+              },
             ]}
           >
             <Text
               style={[
-                styles.secondaryButtonText,
-                { color: activeTheme.primary },
-              ]}
-            >
-              Switch User
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={isTablet ? styles.gridTablet : undefined}>
-          <AccessibleCard
-            title="Next Important Action"
-            description={`${medication.name} ${medication.dose}. ${medication.take}. ${medication.when}.`}
-          />
-
-          <AccessibleCard
-            title="Appointment"
-            description={`${appointment.provider}. ${appointment.date} at ${appointment.time}. ${appointment.reason}.`}
-          />
-
-          <AccessibleCard
-            title="Care Task"
-            description={`${careTask.title}. Start with step 1: ${careTask.instructions[0]}`}
-          />
-
-          <AccessibleCard
-            title="Care Team"
-            description={`Caregiver: ${caregiverName}. Provider: ${providerName}.`}
-          />
-        </View>
-
-        <Text
-          style={[
-            styles.sectionTitle,
-            {
-              color: activeTheme.text,
-              fontSize: typography.sectionTitle * textScale,
-            },
-          ]}
-        >
-          Theme
-        </Text>
-
-        {Object.entries(themes).map(([themeKey, themeValue]) => {
-          const key = themeKey as ThemeOption;
-          const selected = selectedTheme === key;
-
-          return (
-            <Pressable
-              key={key}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              accessibilityLabel={`${themeValue.name} theme`}
-              onPress={() => setSelectedTheme(key)}
-              style={[
-                styles.themeButton,
+                styles.themeButtonText,
                 {
-                  backgroundColor: selected
-                    ? themeValue.softSurface
-                    : activeTheme.surface,
-                  borderColor: selected
-                    ? themeValue.primary
-                    : activeTheme.border,
+                  color: activeTheme.text,
+                  fontSize: typography.bodySmall * textScale,
                 },
               ]}
             >
-              <Text
-                style={[
-                  styles.themeButtonText,
-                  {
-                    color: activeTheme.text,
-                    fontSize: typography.bodySmall * textScale,
-                  },
-                ]}
-              >
-                {selected ? '● ' : '○ '}
-                {themeValue.name}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-    </SafeAreaView>
+              {selected ? '● ' : '○ '}
+              {themeValue.name}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </ThemedScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    padding: spacing.base,
-  },
   hero: {
     borderRadius: 22,
     borderWidth: 1,
@@ -248,9 +241,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 14,
     borderWidth: 1,
+    justifyContent: 'center',
     marginTop: spacing.base,
     minHeight: 48,
-    justifyContent: 'center',
   },
   secondaryButtonText: {
     fontWeight: '700',
@@ -267,9 +260,9 @@ const styles = StyleSheet.create({
   themeButton: {
     borderRadius: 14,
     borderWidth: 1,
+    justifyContent: 'center',
     marginBottom: spacing.sm,
     minHeight: 52,
-    justifyContent: 'center',
     paddingHorizontal: spacing.base,
   },
   themeButtonText: {

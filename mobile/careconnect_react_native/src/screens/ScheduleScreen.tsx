@@ -1,9 +1,9 @@
 ﻿import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { AccessibleCard } from '../components/AccessibleCard';
 import { ReadAloudButton } from '../components/ReadAloudButton';
+import { ThemedScreen } from '../components/ThemedScreen';
 import { useCareConnect } from '../context/AppContext';
 import { scheduleItems } from '../data/careData';
 import { spacing, typography } from '../theme/theme';
@@ -20,82 +20,70 @@ export function ScheduleScreen() {
     );
   };
 
-  const readText = scheduleItems
+  const pageReadText = scheduleItems
     .map((item) => `${item.time}. ${item.title}. ${item.description}`)
     .join(' ');
 
   return (
-    <SafeAreaView
-      style={[
-        styles.safeArea,
-        { backgroundColor: activeTheme.background },
-      ]}
-    >
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text
-          accessibilityRole="header"
-          style={[
-            styles.title,
-            {
-              color: activeTheme.primary,
-              fontSize: typography.screenTitle * textScale,
-            },
-          ]}
-        >
-          Schedule
-        </Text>
+    <ThemedScreen backgroundVariant="schedule">
+      <Text
+        accessibilityRole="header"
+        style={[
+          styles.title,
+          {
+            color: activeTheme.primary,
+            fontSize: typography.screenTitle * textScale,
+          },
+        ]}
+      >
+        Schedule
+      </Text>
 
-        <ReadAloudButton text={readText} />
+      <ReadAloudButton
+        text={pageReadText}
+        label="Read Schedule Page Aloud"
+      />
 
-        {scheduleItems.map((item) => {
-          const completed = completedIds.includes(item.id);
+      {scheduleItems.map((item) => {
+        const completed = completedIds.includes(item.id);
+        const readText = `${item.time}. ${item.title}. ${item.description}`;
 
-          return (
-            <AccessibleCard
-              key={item.id}
-              title={`${item.time} - ${item.title}`}
+        return (
+          <AccessibleCard
+            key={item.id}
+            title={`${item.time} - ${item.title}`}
+            readAloudText={readText}
+          >
+            <Text
+              style={[
+                styles.body,
+                {
+                  color: activeTheme.text,
+                  fontSize: typography.bodySmall * textScale,
+                },
+              ]}
             >
-              <Text
-                style={[
-                  styles.body,
-                  {
-                    color: activeTheme.text,
-                    fontSize: typography.bodySmall * textScale,
-                  },
-                ]}
-              >
-                {item.description}
-              </Text>
+              {item.description}
+            </Text>
 
-              <Pressable
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: completed }}
-                onPress={() => toggleItem(item.id)}
-                style={[
-                  styles.checkButton,
-                  { borderColor: activeTheme.primary },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.checkText,
-                    { color: activeTheme.primary },
-                  ]}
-                >
-                  {completed ? '☑ Complete' : '☐ Mark Complete'}
-                </Text>
-              </Pressable>
-            </AccessibleCard>
-          );
-        })}
-      </ScrollView>
-    </SafeAreaView>
+            <Pressable
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: completed }}
+              onPress={() => toggleItem(item.id)}
+              style={[styles.checkButton, { borderColor: activeTheme.primary }]}
+            >
+              <Text style={[styles.checkText, { color: activeTheme.primary }]}>
+                {completed ? '☑ Complete' : '☐ Mark Complete'}
+              </Text>
+            </Pressable>
+          </AccessibleCard>
+        );
+      })}
+    </ThemedScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  content: { padding: spacing.base },
   title: {
     fontWeight: '700',
     marginBottom: spacing.base,

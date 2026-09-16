@@ -7,14 +7,14 @@ import { spacing, typography } from '../theme/theme';
 
 type ReadAloudButtonProps = {
   text: string;
+  label?: string;
 };
 
-export function ReadAloudButton({ text }: ReadAloudButtonProps) {
-  const { activeTheme, readAloudEnabled, textScale } = useCareConnect();
-
-  if (!readAloudEnabled) {
-    return null;
-  }
+export function ReadAloudButton({
+  text,
+  label = 'Read Aloud',
+}: ReadAloudButtonProps) {
+  const { activeTheme, textScale } = useCareConnect();
 
   const speak = () => {
     Speech.stop();
@@ -27,7 +27,7 @@ export function ReadAloudButton({ text }: ReadAloudButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Read this section aloud"
+      accessibilityLabel={label}
       onPress={speak}
       style={[
         styles.button,
@@ -46,7 +46,7 @@ export function ReadAloudButton({ text }: ReadAloudButtonProps) {
           },
         ]}
       >
-        Read Aloud
+        {label}
       </Text>
     </Pressable>
   );

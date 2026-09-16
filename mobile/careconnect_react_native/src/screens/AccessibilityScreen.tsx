@@ -1,8 +1,9 @@
 ﻿import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { AccessibleCard } from '../components/AccessibleCard';
+import { ReadAloudButton } from '../components/ReadAloudButton';
+import { ThemedScreen } from '../components/ThemedScreen';
 import { useCareConnect } from '../context/AppContext';
 import { ThemeOption } from '../models/types';
 import { spacing, themes, typography } from '../theme/theme';
@@ -26,95 +27,167 @@ export function AccessibilityScreen() {
     setReadAloudEnabled,
   } = useCareConnect();
 
+  const pageReadText =
+    'Accessibility settings. Choose a theme, change text size, turn on wider spacing, or turn on read aloud assistance.';
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: activeTheme.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text accessibilityRole="header" style={[styles.title, { color: activeTheme.primary, fontSize: typography.screenTitle * textScale }]}>
-          Accessibility
-        </Text>
+    <ThemedScreen backgroundVariant="accessibility">
+      <Text
+        accessibilityRole="header"
+        style={[
+          styles.title,
+          {
+            color: activeTheme.primary,
+            fontSize: typography.screenTitle * textScale,
+          },
+        ]}
+      >
+        Accessibility
+      </Text>
 
-        <AccessibleCard
-          title="Appearance Theme"
-          description="Choose the visual theme that is easiest to read."
-        >
-          {Object.entries(themes).map(([themeKey, themeValue]) => {
-            const key = themeKey as ThemeOption;
-            const selected = selectedTheme === key;
+      <ReadAloudButton
+        text={pageReadText}
+        label="Read Accessibility Page Aloud"
+      />
 
-            return (
-              <Pressable
-                key={key}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                accessibilityLabel={`${themeValue.name} theme`}
-                onPress={() => setSelectedTheme(key)}
+      <AccessibleCard
+        title="Appearance Theme"
+        description="Choose the visual theme that is easiest to read."
+        readAloudText="Appearance Theme. Choose the visual theme that is easiest to read."
+      >
+        {Object.entries(themes).map(([themeKey, themeValue]) => {
+          const key = themeKey as ThemeOption;
+          const selected = selectedTheme === key;
+
+          return (
+            <Pressable
+              key={key}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              accessibilityLabel={`${themeValue.name} theme`}
+              onPress={() => setSelectedTheme(key)}
+              style={[
+                styles.option,
+                {
+                  backgroundColor: selected
+                    ? themeValue.softSurface
+                    : activeTheme.surface,
+                  borderColor: selected
+                    ? themeValue.primary
+                    : activeTheme.border,
+                },
+              ]}
+            >
+              <Text
                 style={[
-                  styles.option,
+                  styles.optionText,
                   {
-                    backgroundColor: selected ? themeValue.softSurface : activeTheme.surface,
-                    borderColor: selected ? themeValue.primary : activeTheme.border,
+                    color: activeTheme.text,
+                    fontSize: typography.bodySmall * textScale,
                   },
                 ]}
               >
-                <Text style={[styles.optionText, { color: activeTheme.text, fontSize: typography.bodySmall * textScale }]}>
-                  {selected ? '● ' : '○ '}
-                  {themeValue.name}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </AccessibleCard>
+                {selected ? '● ' : '○ '}
+                {themeValue.name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </AccessibleCard>
 
-        <AccessibleCard title="Text Size" description="Increase text size without changing the care workflow.">
-          {textSizes.map((item) => {
-            const selected = textScale === item.value;
+      <AccessibleCard
+        title="Text Size"
+        description="Increase text size without changing the care workflow."
+        readAloudText="Text Size. Increase text size without changing the care workflow."
+      >
+        {textSizes.map((item) => {
+          const selected = textScale === item.value;
 
-            return (
-              <Pressable
-                key={item.label}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                onPress={() => setTextScale(item.value)}
+          return (
+            <Pressable
+              key={item.label}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              accessibilityLabel={`${item.label} text size`}
+              onPress={() => setTextScale(item.value)}
+              style={[
+                styles.option,
+                {
+                  backgroundColor: selected
+                    ? activeTheme.softSurface
+                    : activeTheme.surface,
+                  borderColor: selected
+                    ? activeTheme.primary
+                    : activeTheme.border,
+                },
+              ]}
+            >
+              <Text
                 style={[
-                  styles.option,
+                  styles.optionText,
                   {
-                    backgroundColor: selected ? activeTheme.softSurface : activeTheme.surface,
-                    borderColor: selected ? activeTheme.primary : activeTheme.border,
+                    color: activeTheme.text,
+                    fontSize: typography.bodySmall * textScale,
                   },
                 ]}
               >
-                <Text style={[styles.optionText, { color: activeTheme.text, fontSize: typography.bodySmall * textScale }]}>
-                  {selected ? '● ' : '○ '}
-                  {item.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </AccessibleCard>
+                {selected ? '● ' : '○ '}
+                {item.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </AccessibleCard>
 
-        <AccessibleCard title="Reading Support">
-          <View style={styles.switchRow}>
-            <Text style={[styles.switchText, { color: activeTheme.text, fontSize: typography.bodySmall * textScale }]}>
-              Wider spacing
-            </Text>
-            <Switch value={wideSpacing} onValueChange={setWideSpacing} />
-          </View>
+      <AccessibleCard
+        title="Reading Support"
+        readAloudText="Reading Support. Wider spacing and read aloud assistance can be turned on or off."
+      >
+        <View style={styles.switchRow}>
+          <Text
+            style={[
+              styles.switchText,
+              {
+                color: activeTheme.text,
+                fontSize: typography.bodySmall * textScale,
+              },
+            ]}
+          >
+            Wider spacing
+          </Text>
 
-          <View style={styles.switchRow}>
-            <Text style={[styles.switchText, { color: activeTheme.text, fontSize: typography.bodySmall * textScale }]}>
-              Read aloud assistance
-            </Text>
-            <Switch value={readAloudEnabled} onValueChange={setReadAloudEnabled} />
-          </View>
-        </AccessibleCard>
-      </ScrollView>
-    </SafeAreaView>
+          <Switch
+            accessibilityLabel="Wider spacing"
+            value={wideSpacing}
+            onValueChange={setWideSpacing}
+          />
+        </View>
+
+        <View style={styles.switchRow}>
+          <Text
+            style={[
+              styles.switchText,
+              {
+                color: activeTheme.text,
+                fontSize: typography.bodySmall * textScale,
+              },
+            ]}
+          >
+            Read aloud assistance
+          </Text>
+
+          <Switch
+            accessibilityLabel="Read aloud assistance"
+            value={readAloudEnabled}
+            onValueChange={setReadAloudEnabled}
+          />
+        </View>
+      </AccessibleCard>
+    </ThemedScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  content: { padding: spacing.base },
   title: {
     fontWeight: '700',
     marginBottom: spacing.base,

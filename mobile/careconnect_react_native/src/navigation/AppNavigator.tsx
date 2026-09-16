@@ -1,4 +1,5 @@
 ﻿import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -24,6 +25,37 @@ type MainTabsParamList = {
 
 const Tab = createBottomTabNavigator<MainTabsParamList>();
 
+function tabIcon(
+  routeName: keyof MainTabsParamList,
+  focused: boolean,
+): keyof typeof Ionicons.glyphMap {
+  if (routeName === 'Home') {
+    return focused ? 'home' : 'home-outline';
+  }
+
+  if (routeName === 'Medications') {
+    return focused ? 'medkit' : 'medkit-outline';
+  }
+
+  if (routeName === 'Appointments') {
+    return focused ? 'calendar' : 'calendar-outline';
+  }
+
+  if (routeName === 'Care Plan') {
+    return focused ? 'checkbox' : 'checkbox-outline';
+  }
+
+  if (routeName === 'Schedule') {
+    return focused ? 'time' : 'time-outline';
+  }
+
+  if (routeName === 'My Health') {
+    return focused ? 'heart' : 'heart-outline';
+  }
+
+  return focused ? 'settings' : 'settings-outline';
+}
+
 export function AppNavigator() {
   const { role, activeTheme } = useCareConnect();
 
@@ -38,7 +70,7 @@ export function AppNavigator() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        screenOptions={{
+        screenOptions={({ route }) => ({
           headerStyle: {
             backgroundColor: activeTheme.primary,
           },
@@ -53,7 +85,14 @@ export function AppNavigator() {
             fontSize: 11,
             fontWeight: '600',
           },
-        }}
+          tabBarIcon: ({ color, focused, size }) => (
+            <Ionicons
+              name={tabIcon(route.name as keyof MainTabsParamList, focused)}
+              color={color}
+              size={size}
+            />
+          ),
+        })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Medications" component={MedicationsScreen} />

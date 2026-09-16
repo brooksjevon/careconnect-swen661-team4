@@ -3,16 +3,19 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { useCareConnect } from '../context/AppContext';
 import { spacing, typography } from '../theme/theme';
+import { ReadAloudButton } from './ReadAloudButton';
 
 type AccessibleCardProps = {
   title: string;
   description?: string;
+  readAloudText?: string;
   children?: ReactNode;
 };
 
 export function AccessibleCard({
   title,
   description,
+  readAloudText,
   children,
 }: AccessibleCardProps) {
   const { activeTheme, textScale, wideSpacing } = useCareConnect();
@@ -20,11 +23,10 @@ export function AccessibleCard({
   const cardPadding = wideSpacing ? spacing.lg : spacing.base;
   const descriptionLineHeight = wideSpacing ? 30 : 24;
   const titleLineHeight = wideSpacing ? 34 : 30;
+  const cardReadText = readAloudText ?? `${title}. ${description ?? ''}`;
 
   return (
     <View
-      accessible
-      accessibilityRole="summary"
       style={[
         styles.card,
         {
@@ -35,6 +37,7 @@ export function AccessibleCard({
       ]}
     >
       <Text
+        accessibilityRole="header"
         style={[
           styles.title,
           {
@@ -61,6 +64,11 @@ export function AccessibleCard({
           {description}
         </Text>
       ) : null}
+
+      <ReadAloudButton
+        text={cardReadText}
+        label={`Read ${title} Aloud`}
+      />
 
       {children}
     </View>

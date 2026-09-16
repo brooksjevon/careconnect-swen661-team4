@@ -1,9 +1,9 @@
 ﻿import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text } from 'react-native';
 
 import { AccessibleCard } from '../components/AccessibleCard';
 import { ReadAloudButton } from '../components/ReadAloudButton';
+import { ThemedScreen } from '../components/ThemedScreen';
 import { useCareConnect } from '../context/AppContext';
 import {
   caregiverName,
@@ -16,73 +16,72 @@ import { spacing, typography } from '../theme/theme';
 export function MyHealthScreen() {
   const { activeTheme, textScale } = useCareConnect();
 
-  const readText = `${patientName}. Caregiver: ${caregiverName}. Provider: ${providerName}. ${healthSummary
+  const pageReadText = `${patientName}. Caregiver: ${caregiverName}. Provider: ${providerName}. ${healthSummary
     .map((item) => `${item.label}: ${item.value}. ${item.plainLanguage}`)
     .join(' ')}`;
 
   return (
-    <SafeAreaView
-      style={[
-        styles.safeArea,
-        { backgroundColor: activeTheme.background },
-      ]}
-    >
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text
-          accessibilityRole="header"
-          style={[
-            styles.title,
-            {
-              color: activeTheme.primary,
-              fontSize: typography.screenTitle * textScale,
-            },
-          ]}
-        >
-          My Health
-        </Text>
+    <ThemedScreen backgroundVariant="myHealth">
+      <Text
+        accessibilityRole="header"
+        style={[
+          styles.title,
+          {
+            color: activeTheme.primary,
+            fontSize: typography.screenTitle * textScale,
+          },
+        ]}
+      >
+        My Health
+      </Text>
 
+      <ReadAloudButton
+        text={pageReadText}
+        label="Read My Health Page Aloud"
+      />
+
+      <AccessibleCard
+        title={patientName}
+        description={`Caregiver: ${caregiverName}. Provider: ${providerName}.`}
+        readAloudText={pageReadText}
+      />
+
+      {healthSummary.map((item) => (
         <AccessibleCard
-          title={patientName}
-          description={`Caregiver: ${caregiverName}. Provider: ${providerName}.`}
+          key={item.id}
+          title={item.label}
+          readAloudText={`${item.label}. ${item.value}. ${item.plainLanguage}`}
         >
-          <ReadAloudButton text={readText} />
+          <Text
+            style={[
+              styles.value,
+              {
+                color: activeTheme.primary,
+                fontSize: typography.body * textScale,
+              },
+            ]}
+          >
+            {item.value}
+          </Text>
+
+          <Text
+            style={[
+              styles.body,
+              {
+                color: activeTheme.text,
+                fontSize: typography.bodySmall * textScale,
+              },
+            ]}
+          >
+            {item.plainLanguage}
+          </Text>
         </AccessibleCard>
-
-        {healthSummary.map((item) => (
-          <AccessibleCard key={item.id} title={item.label}>
-            <Text
-              style={[
-                styles.value,
-                {
-                  color: activeTheme.primary,
-                  fontSize: typography.body * textScale,
-                },
-              ]}
-            >
-              {item.value}
-            </Text>
-
-            <Text
-              style={[
-                styles.body,
-                {
-                  color: activeTheme.text,
-                  fontSize: typography.bodySmall * textScale,
-                },
-              ]}
-            >
-              {item.plainLanguage}
-            </Text>
-          </AccessibleCard>
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+      ))}
+    </ThemedScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  content: { padding: spacing.base },
   title: {
     fontWeight: '700',
     marginBottom: spacing.base,
