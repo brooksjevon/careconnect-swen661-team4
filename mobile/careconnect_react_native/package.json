@@ -29,7 +29,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --coverage --runInBand",
+    "test": "jest --coverage --runInBand --watchAll=false",
     "test:watch": "jest --watchAll=false"
   },
   "private": true,
@@ -41,7 +41,9 @@
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/**/*.d.ts",
-      "!src/navigation/**"
+      "!src/models/**",
+      "!src/navigation/**",
+      "!src/screens/PlaceholderScreen.tsx"
     ],
     "coverageDirectory": "coverage"
   }

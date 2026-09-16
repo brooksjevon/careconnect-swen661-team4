@@ -5,9 +5,10 @@ The React Native CareConnect app has Jest and React Native Testing Library tests
 ## Current status
 
 - careLogic.test.ts passes.
-- App.test.tsx is still failing.
-- The current failure appears related to React Native Testing Library interaction timing and state updates around role selection and sign-in.
-- App screens are rendering, but some tests are not waiting correctly for role and navigation updates.
+- App.test.tsx passes.
+- Current result: 2 test suites passed.
+- Current result: 18 tests passed.
+- Jest coverage report is generated in coverage/lcov-report/index.html.
 
 ## Commands to run
 
@@ -18,15 +19,21 @@ npm.cmd install
 npx.cmd tsc --noEmit
 npm.cmd test
 
-## Help needed
+## Testing focus
 
-Please review __tests__/App.test.tsx, especially:
+The current test suite covers:
 
-- role button selection
-- sign-in button state change from Patient to Caregiver or Provider
-- use of waitFor, userEvent, and fireEvent
-- possible need to test screens individually instead of testing the full app at once
+- sign-in role options and validation
+- Home dashboard content
+- medication completion
+- appointment preparation checklist
+- care plan checklist and finish button
+- schedule completion
+- health summary
+- accessibility settings
+- reusable accessible card
+- read-aloud button behavior
 
 ## Goal
 
-Get the React Native Week 5 test suite passing and increase coverage toward the Week 5 testing requirement.
+Use the passing Jest/RNTL test suite and coverage report as part of the Week 5 React Native testing submission.

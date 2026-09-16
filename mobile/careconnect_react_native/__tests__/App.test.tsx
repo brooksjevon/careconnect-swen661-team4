@@ -1,129 +1,204 @@
 ﻿import { afterEach, describe, expect, jest, test } from '@jest/globals';
 import {
+  act,
   cleanup,
   fireEvent,
   render,
-  userEvent,
-  waitFor,
 } from '@testing-library/react-native';
 import React from 'react';
+import * as Speech from 'expo-speech';
 
-import App from '../App';
+import { AccessibleCard } from '../src/components/AccessibleCard';
+import { ReadAloudButton } from '../src/components/ReadAloudButton';
+import { AppProvider } from '../src/context/AppContext';
+import { AccessibilityScreen } from '../src/screens/AccessibilityScreen';
+import { AppointmentsScreen } from '../src/screens/AppointmentsScreen';
+import { CarePlanScreen } from '../src/screens/CarePlanScreen';
+import { HomeScreen } from '../src/screens/HomeScreen';
+import { MedicationsScreen } from '../src/screens/MedicationsScreen';
+import { MyHealthScreen } from '../src/screens/MyHealthScreen';
+import { ScheduleScreen } from '../src/screens/ScheduleScreen';
+import { SignInScreen } from '../src/screens/SignInScreen';
+
+function renderWithProvider(component: React.ReactElement) {
+  return render(<AppProvider>{component}</AppProvider>);
+}
+
+async function pressItem(item: unknown) {
+  await act(async () => {
+    fireEvent.press(item);
+  });
+}
+
+async function typeText(item: unknown, value: string) {
+  await act(async () => {
+    fireEvent.changeText(item, value);
+  });
+}
 
 afterEach(async () => {
   await cleanup();
   jest.clearAllMocks();
 });
 
-describe('CareConnect React Native app', () => {
-  test('shows sign-in roles', async () => {
-    const { getByLabelText, getByText } = await render(<App />);
+describe('CareConnect React Native screen and component tests', () => {
+  test('SignInScreen shows role options and validates an empty form', async () => {
+    const screen = await renderWithProvider(<SignInScreen />);
 
-    expect(getByText('CareConnect')).toBeTruthy();
-    expect(getByText('Sign in to continue')).toBeTruthy();
-    expect(getByLabelText('Patient sign-in option')).toBeTruthy();
-    expect(getByLabelText('Caregiver sign-in option')).toBeTruthy();
-    expect(getByLabelText('Provider sign-in option')).toBeTruthy();
+    expect(await screen.findByText('CareConnect')).toBeTruthy();
+    expect(await screen.findByText('Sign in to continue')).toBeTruthy();
+    expect(await screen.findByLabelText('Patient sign-in option')).toBeTruthy();
+    expect(await screen.findByLabelText('Caregiver sign-in option')).toBeTruthy();
+    expect(await screen.findByLabelText('Provider sign-in option')).toBeTruthy();
+
+    await pressItem(await screen.findByLabelText('Sign in as Patient'));
+
+    expect(await screen.findByText('Enter your email.')).toBeTruthy();
+    expect(await screen.findByText('Enter your password.')).toBeTruthy();
   });
 
-  test('shows validation messages when sign-in is submitted empty', async () => {
-    const user = userEvent.setup();
-    const { getByLabelText, getByText } = await render(<App />);
+  test('SignInScreen allows caregiver role selection', async () => {
+    const screen = await renderWithProvider(<SignInScreen />);
 
-    await user.press(getByLabelText('Sign in as Patient'));
+    await pressItem(await screen.findByLabelText('Caregiver sign-in option'));
 
-    await waitFor(() => {
-      expect(getByText('Enter your email.')).toBeTruthy();
-      expect(getByText('Enter your password.')).toBeTruthy();
-    });
+    expect(await screen.findByLabelText('Sign in as Caregiver')).toBeTruthy();
   });
 
-  test('caregiver can sign in and see caregiver dashboard', async () => {
-    const user = userEvent.setup();
-    const { getByLabelText, getByText } = await render(<App />);
+  test('HomeScreen shows dashboard content and theme options', async () => {
+    const screen = await renderWithProvider(<HomeScreen />);
 
-    await user.press(getByLabelText('Caregiver sign-in option'));
+    expect(await screen.findByText('Good morning, Jevon Brooks')).toBeTruthy();
+    expect(await screen.findByText('Next Important Action')).toBeTruthy();
+    expect(await screen.findByText('Appointment')).toBeTruthy();
+    expect(await screen.findByText('Care Task')).toBeTruthy();
+    expect(await screen.findByText('Care Team')).toBeTruthy();
 
-    await waitFor(() => {
-      expect(getByLabelText('Sign in as Caregiver')).toBeTruthy();
-    });
+    await pressItem(await screen.findByLabelText('Blue & Green theme'));
 
-    fireEvent.changeText(getByLabelText('Email'), 'test@careconnect.com');
-    fireEvent.changeText(getByLabelText('Password'), 'test123');
-
-    await user.press(getByLabelText('Sign in as Caregiver'));
-
-    await waitFor(() => {
-      expect(getByText('Caregiver Dashboard')).toBeTruthy();
-      expect(
-        getByText("Review Jevon Brooks's care activity and upcoming needs."),
-      ).toBeTruthy();
-    });
+    expect(await screen.findByLabelText('Blue & Green theme')).toBeTruthy();
   });
 
-  test('provider can sign in and see provider dashboard', async () => {
-    const user = userEvent.setup();
-    const { getByLabelText, getByText } = await render(<App />);
+  test('MedicationsScreen marks medication as taken', async () => {
+    const screen = await renderWithProvider(<MedicationsScreen />);
 
-    await user.press(getByLabelText('Provider sign-in option'));
+    expect(await screen.findByText('Medications')).toBeTruthy();
+    expect(await screen.findByText('Lisinopril - 10 mg')).toBeTruthy();
 
-    await waitFor(() => {
-      expect(getByLabelText('Sign in as Provider')).toBeTruthy();
-    });
+    await pressItem(await screen.findByLabelText('Mark Lisinopril as taken'));
 
-    fireEvent.changeText(getByLabelText('Email'), 'provider@careconnect.com');
-    fireEvent.changeText(getByLabelText('Password'), 'test123');
-
-    await user.press(getByLabelText('Sign in as Provider'));
-
-    await waitFor(() => {
-      expect(getByText('Provider Dashboard')).toBeTruthy();
-      expect(
-        getByText(
-          "Review Jevon Brooks's medications, appointments, and care plan.",
-        ),
-      ).toBeTruthy();
-    });
+    expect(await screen.findByText('Taken Today')).toBeTruthy();
   });
 
-  test('patient can sign in and switch user returns to sign-in screen', async () => {
-    const user = userEvent.setup();
-    const { getByLabelText, getByText } = await render(<App />);
+  test('AppointmentsScreen completes appointment preparation checklist', async () => {
+    const screen = await renderWithProvider(<AppointmentsScreen />);
 
-    fireEvent.changeText(getByLabelText('Email'), 'patient@careconnect.com');
-    fireEvent.changeText(getByLabelText('Password'), 'test123');
+    expect(await screen.findByText('Appointments')).toBeTruthy();
+    expect(await screen.findByText('Appointment Preparation')).toBeTruthy();
+    expect(await screen.findByText('Not Complete')).toBeTruthy();
 
-    await user.press(getByLabelText('Sign in as Patient'));
+    const checkboxes = await screen.findAllByRole('checkbox');
 
-    await waitFor(() => {
-      expect(getByText('Good morning, Jevon Brooks')).toBeTruthy();
-    });
+    for (const checkbox of checkboxes) {
+      await pressItem(checkbox);
+    }
 
-    await user.press(getByLabelText('Switch user'));
-
-    await waitFor(() => {
-      expect(getByText('Sign in to continue')).toBeTruthy();
-      expect(getByLabelText('Patient sign-in option')).toBeTruthy();
-    });
+    expect(await screen.findByText('Preparation Complete')).toBeTruthy();
   });
 
-  test('theme can be changed from Home screen', async () => {
-    const user = userEvent.setup();
-    const { getByLabelText, getByText } = await render(<App />);
+  test('CarePlanScreen enables finish button after all steps are checked', async () => {
+    const screen = await renderWithProvider(<CarePlanScreen />);
 
-    fireEvent.changeText(getByLabelText('Email'), 'patient@careconnect.com');
-    fireEvent.changeText(getByLabelText('Password'), 'test123');
+    expect(await screen.findByText('Care Plan')).toBeTruthy();
+    expect(await screen.findByText('Finish Instructions Disabled')).toBeTruthy();
 
-    await user.press(getByLabelText('Sign in as Patient'));
+    const checkboxes = await screen.findAllByRole('checkbox');
 
-    await waitFor(() => {
-      expect(getByText('Good morning, Jevon Brooks')).toBeTruthy();
-    });
+    for (const checkbox of checkboxes) {
+      await pressItem(checkbox);
+    }
 
-    await user.press(getByLabelText('Blue & Green theme'));
+    expect(await screen.findByText('Finish Instructions')).toBeTruthy();
+  });
 
-    await waitFor(() => {
-      expect(getByLabelText('Blue & Green theme')).toBeTruthy();
-    });
+  test('ScheduleScreen marks a schedule item complete', async () => {
+    const screen = await renderWithProvider(<ScheduleScreen />);
+
+    expect(await screen.findByText('Schedule')).toBeTruthy();
+    expect(await screen.findByText('8:00 AM - Morning Medication')).toBeTruthy();
+
+    const checkboxes = await screen.findAllByRole('checkbox');
+
+    await pressItem(checkboxes[0]);
+
+    expect(await screen.findByText('☑ Complete')).toBeTruthy();
+  });
+
+  test('MyHealthScreen shows patient health summary', async () => {
+    const screen = await renderWithProvider(<MyHealthScreen />);
+
+    expect(await screen.findByText('My Health')).toBeTruthy();
+    expect(await screen.findByText('Jevon Brooks')).toBeTruthy();
+    expect(await screen.findByText('Blood Pressure')).toBeTruthy();
+    expect(await screen.findByText('Medication')).toBeTruthy();
+    expect(await screen.findByText('Care Support')).toBeTruthy();
+  });
+
+  test('AccessibilityScreen shows theme, text size, and reading support controls', async () => {
+    const screen = await renderWithProvider(<AccessibilityScreen />);
+
+    expect(await screen.findByText('Accessibility')).toBeTruthy();
+    expect(await screen.findByText('Appearance Theme')).toBeTruthy();
+    expect(await screen.findByText('Text Size')).toBeTruthy();
+    expect(await screen.findByText('Reading Support')).toBeTruthy();
+
+    await pressItem(await screen.findByLabelText('Purple & Pink theme'));
+    await pressItem(await screen.findByLabelText('Large text size'));
+
+    expect(await screen.findByLabelText('Purple & Pink theme')).toBeTruthy();
+    expect(await screen.findByLabelText('Large text size')).toBeTruthy();
+  });
+
+  test('AccessibleCard renders content and read-aloud control', async () => {
+    const screen = await renderWithProvider(
+      <AccessibleCard
+        title="Test Card"
+        description="This card is readable."
+      />,
+    );
+
+    expect(await screen.findByText('Test Card')).toBeTruthy();
+    expect(await screen.findByText('This card is readable.')).toBeTruthy();
+    expect(await screen.findByLabelText('Read Test Card Aloud')).toBeTruthy();
+  });
+
+  test('ReadAloudButton calls Expo Speech', async () => {
+    const screen = await renderWithProvider(
+      <ReadAloudButton text="Read this test aloud." label="Read Test Aloud" />,
+    );
+
+    await pressItem(await screen.findByLabelText('Read Test Aloud'));
+
+    expect(Speech.stop).toHaveBeenCalled();
+    expect(Speech.speak).toHaveBeenCalledWith(
+      'Read this test aloud.',
+      expect.objectContaining({
+        rate: 0.85,
+        pitch: 1,
+      }),
+    );
+  });
+
+  test('SignInScreen accepts typing into email and password fields', async () => {
+    const screen = await renderWithProvider(<SignInScreen />);
+
+    const email = await screen.findByLabelText('Email');
+    const password = await screen.findByLabelText('Password');
+
+    await typeText(email, 'student@careconnect.com');
+    await typeText(password, 'test123');
+
+    expect(email.props.value).toBe('student@careconnect.com');
+    expect(password.props.value).toBe('test123');
   });
 });

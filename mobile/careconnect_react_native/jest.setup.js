@@ -30,6 +30,32 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
+jest.mock('@expo/vector-icons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+
+  const MockIonicons = ({ name }) =>
+    React.createElement(Text, { accessibilityLabel: `icon-${name}` }, '');
+
+  MockIonicons.glyphMap = {};
+
+  return {
+    Ionicons: MockIonicons,
+  };
+});
+
+jest.mock('@expo/vector-icons/Ionicons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+
+  const MockIonicons = ({ name }) =>
+    React.createElement(Text, { accessibilityLabel: `icon-${name}` }, '');
+
+  MockIonicons.glyphMap = {};
+
+  return MockIonicons;
+});
+
 jest.mock('react-native-screens', () => ({
   enableScreens: jest.fn(),
 }));
