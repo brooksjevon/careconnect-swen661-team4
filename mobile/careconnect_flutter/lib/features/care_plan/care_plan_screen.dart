@@ -37,7 +37,13 @@ class _CarePlanScreenState extends State<CarePlanScreen> {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.base),
           children: [
-            Text('Care Plan', style: Theme.of(context).textTheme.headlineLarge),
+            // Visual heading only – AppBar already announces "Care Plan"
+            ExcludeSemantics(
+              child: Text(
+                'Care Plan',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Your care activities for today.',
@@ -108,52 +114,78 @@ class _CareTask extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(child: Text(number)),
-            const SizedBox(width: AppSpacing.base),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: Theme.of(context).textTheme.titleLarge),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
-                    children: [
-                      Icon(icon, semanticLabel: status),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          'Status: $status',
-                          style: Theme.of(context).textTheme.bodyMedium,
+    // Build a single merged announcement for the whole card so a
+    // screen reader hears the task in context instead of fragments.
+    final semanticLabel =
+        'Task $number: $title. Status: $status. $supportingText';
+
+    return Semantics(
+      container: true,
+      label: semanticLabel,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.base),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ExcludeSemantics(
+                child: CircleAvatar(child: Text(number)),
+              ),
+              const SizedBox(width: AppSpacing.base),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ExcludeSemantics(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    ExcludeSemantics(
+                      child: Row(
+                        children: [
+                          Icon(icon),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              'Status: $status',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    ExcludeSemantics(
+                      child: Text(
+                        supportingText,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    if (actionLabel != null && onAction != null) ...[
+                      const SizedBox(height: AppSpacing.base),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Semantics(
+                          button: true,
+                          hint: 'Opens the instructions for this task',
+                          child: OutlinedButton.icon(
+                            onPressed: onAction,
+                            icon: const ExcludeSemantics(
+                              child: Icon(Icons.arrow_forward),
+                            ),
+                            label: Text(actionLabel!),
+                          ),
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    supportingText,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  if (actionLabel != null && onAction != null) ...[
-                    const SizedBox(height: AppSpacing.base),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: onAction,
-                        icon: const Icon(Icons.arrow_forward),
-                        label: Text(actionLabel!),
-                      ),
-                    ),
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
