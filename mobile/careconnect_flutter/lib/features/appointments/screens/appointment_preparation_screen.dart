@@ -28,9 +28,13 @@ class _AppointmentPreparationScreenState
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.base),
           children: [
-            Text(
-              'Get Ready for Your Appointment',
-              style: Theme.of(context).textTheme.headlineLarge,
+            // Screen heading
+            Semantics(
+              header: true,
+              child: Text(
+                'Get Ready for Your Appointment',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -39,7 +43,7 @@ class _AppointmentPreparationScreenState
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            _InformationCard(
+            const _InformationCard(
               icon: Icons.person_outline,
               label: 'Provider',
               value: 'Dr. Patel',
@@ -47,7 +51,7 @@ class _AppointmentPreparationScreenState
 
             const SizedBox(height: AppSpacing.md),
 
-            _InformationCard(
+            const _InformationCard(
               icon: Icons.calendar_month_outlined,
               label: 'When',
               value: 'Monday, August 31 at 10:30 AM',
@@ -55,7 +59,7 @@ class _AppointmentPreparationScreenState
 
             const SizedBox(height: AppSpacing.md),
 
-            _InformationCard(
+            const _InformationCard(
               icon: Icons.location_on_outlined,
               label: 'Where',
               value: 'CareConnect Family Clinic, Room 204',
@@ -63,7 +67,7 @@ class _AppointmentPreparationScreenState
 
             const SizedBox(height: AppSpacing.md),
 
-            _InformationCard(
+            const _InformationCard(
               icon: Icons.favorite_outline,
               label: 'Purpose',
               value: 'Blood pressure follow-up',
@@ -71,9 +75,13 @@ class _AppointmentPreparationScreenState
 
             const SizedBox(height: AppSpacing.xl),
 
-            Text(
-              'What to Bring',
-              style: Theme.of(context).textTheme.headlineMedium,
+            // Section heading
+            Semantics(
+              header: true,
+              child: Text(
+                'What to Bring',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
             ),
 
             const SizedBox(height: AppSpacing.sm),
@@ -96,7 +104,9 @@ class _AppointmentPreparationScreenState
                       });
                     },
                     title: const Text('Photo ID'),
-                    secondary: const Icon(Icons.badge_outlined),
+                    secondary: const ExcludeSemantics(
+                      child: Icon(Icons.badge_outlined),
+                    ),
                     controlAffinity: ListTileControlAffinity.trailing,
                   ),
                   const Divider(height: 1),
@@ -108,7 +118,9 @@ class _AppointmentPreparationScreenState
                       });
                     },
                     title: const Text('Medication list'),
-                    secondary: const Icon(Icons.medication_outlined),
+                    secondary: const ExcludeSemantics(
+                      child: Icon(Icons.medication_outlined),
+                    ),
                     controlAffinity: ListTileControlAffinity.trailing,
                   ),
                   const Divider(height: 1),
@@ -120,7 +132,9 @@ class _AppointmentPreparationScreenState
                       });
                     },
                     title: const Text('Blood pressure log'),
-                    secondary: const Icon(Icons.monitor_heart_outlined),
+                    secondary: const ExcludeSemantics(
+                      child: Icon(Icons.monitor_heart_outlined),
+                    ),
                     controlAffinity: ListTileControlAffinity.trailing,
                   ),
                 ],
@@ -129,9 +143,13 @@ class _AppointmentPreparationScreenState
 
             const SizedBox(height: AppSpacing.xl),
 
-            Text(
-              'Questions to Ask',
-              style: Theme.of(context).textTheme.headlineMedium,
+            // Section heading
+            Semantics(
+              header: true,
+              child: Text(
+                'Questions to Ask',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
             ),
 
             const SizedBox(height: AppSpacing.md),
@@ -156,18 +174,20 @@ class _AppointmentPreparationScreenState
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.volume_up_outlined,
-                      semanticLabel: 'Read aloud available',
+                    const ExcludeSemantics(
+                      child: Icon(Icons.volume_up_outlined),
                     ),
                     const SizedBox(width: AppSpacing.base),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Read Aloud',
-                            style: Theme.of(context).textTheme.titleLarge,
+                          Semantics(
+                            header: true,
+                            child: Text(
+                              'Read Aloud',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
@@ -186,10 +206,16 @@ class _AppointmentPreparationScreenState
 
             SizedBox(
               width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: completePreparation,
-                icon: const Icon(Icons.check_circle_outline),
-                label: const Text('Mark Preparation Complete'),
+              child: Semantics(
+                button: true,
+                hint: 'Marks this appointment as ready',
+                child: FilledButton.icon(
+                  onPressed: completePreparation,
+                  icon: const ExcludeSemantics(
+                    child: Icon(Icons.check_circle_outline),
+                  ),
+                  label: const Text('Mark Preparation Complete'),
+                ),
               ),
             ),
 
@@ -212,27 +238,49 @@ class _InformationCard extends StatelessWidget {
     required this.value,
   });
 
+  /// Expands common abbreviations so screen readers announce them
+  /// correctly. "Dr." would otherwise be read as "drive".
+  String _expandAbbreviations(String input) {
+    return input
+        .replaceAll(RegExp(r'\bDr\.\s*'), 'Doctor ')
+        .replaceAll(RegExp(r'\bMr\.\s*'), 'Mister ')
+        .replaceAll(RegExp(r'\bMrs\.\s*'), 'Missus ')
+        .replaceAll(RegExp(r'\bMs\.\s*'), 'Miss ')
+        .replaceAll(RegExp(r'\bSt\.\s*'), 'Street ');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, semanticLabel: label),
-            const SizedBox(width: AppSpacing.base),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: Theme.of(context).textTheme.titleLarge),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(value, style: Theme.of(context).textTheme.bodyLarge),
-                ],
+    return Semantics(
+      label: '$label: ${_expandAbbreviations(value)}',
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.base),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ExcludeSemantics(child: Icon(icon)),
+              const SizedBox(width: AppSpacing.base),
+              Expanded(
+                child: ExcludeSemantics(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        value,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -247,21 +295,25 @@ class _QuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(child: Text(number)),
-            const SizedBox(width: AppSpacing.base),
-            Expanded(
-              child: Text(
-                question,
-                style: Theme.of(context).textTheme.bodyLarge,
+    return MergeSemantics(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.base),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ExcludeSemantics(
+                child: CircleAvatar(child: Text(number)),
               ),
-            ),
-          ],
+              const SizedBox(width: AppSpacing.base),
+              Expanded(
+                child: Text(
+                  'Question $number: $question',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

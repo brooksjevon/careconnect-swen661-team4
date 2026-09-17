@@ -51,9 +51,13 @@ class _MedicationDetailsScreenState extends State<MedicationDetailsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.base),
           children: [
-            Text(
-              widget.medication.name,
-              style: Theme.of(context).textTheme.headlineLarge,
+            // Medication name – main heading
+            Semantics(
+              header: true,
+              child: Text(
+                widget.medication.name,
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -81,24 +85,29 @@ class _MedicationDetailsScreenState extends State<MedicationDetailsScreen> {
               icon: Icons.favorite_outline,
             ),
             const SizedBox(height: AppSpacing.lg),
+
+            // Read Aloud info card
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.base),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.volume_up_outlined,
-                      semanticLabel: 'Read aloud available',
+                    const ExcludeSemantics(
+                      child: Icon(Icons.volume_up_outlined),
                     ),
                     const SizedBox(width: AppSpacing.base),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Read Aloud',
-                            style: Theme.of(context).textTheme.titleLarge,
+                          Semantics(
+                            header: true,
+                            child: Text(
+                              'Read Aloud',
+                              style:
+                                  Theme.of(context).textTheme.titleLarge,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
@@ -113,14 +122,29 @@ class _MedicationDetailsScreenState extends State<MedicationDetailsScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
+
+            // Mark as Taken button
             SizedBox(
               width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: takenToday ? null : markAsTaken,
-                icon: Icon(
-                  takenToday ? Icons.check_circle : Icons.check_circle_outline,
+              child: Semantics(
+                button: true,
+                enabled: !takenToday,
+                hint: takenToday
+                    ? 'This medication has already been marked as taken'
+                    : 'Marks ${widget.medication.name} as taken today',
+                child: FilledButton.icon(
+                  onPressed: takenToday ? null : markAsTaken,
+                  icon: ExcludeSemantics(
+                    child: Icon(
+                      takenToday
+                          ? Icons.check_circle
+                          : Icons.check_circle_outline,
+                    ),
+                  ),
+                  label: Text(
+                    takenToday ? 'Taken Today' : 'Mark as Taken',
+                  ),
                 ),
-                label: Text(takenToday ? 'Taken Today' : 'Mark as Taken'),
               ),
             ),
           ],
@@ -137,25 +161,32 @@ class _StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Row(
-          children: [
-            Icon(
-              takenToday ? Icons.check_circle_outline : Icons.schedule_outlined,
-              semanticLabel: takenToday
-                  ? 'Medication taken'
-                  : 'Medication not taken',
+    final statusText = takenToday ? 'Taken today' : 'Not taken yet';
+
+    return Semantics(
+      container: true,
+      label: 'Status: $statusText',
+      child: ExcludeSemantics(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.base),
+            child: Row(
+              children: [
+                Icon(
+                  takenToday
+                      ? Icons.check_circle_outline
+                      : Icons.schedule_outlined,
+                ),
+                const SizedBox(width: AppSpacing.base),
+                Expanded(
+                  child: Text(
+                    statusText,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: AppSpacing.base),
-            Expanded(
-              child: Text(
-                takenToday ? 'Taken today' : 'Not taken yet',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -175,25 +206,37 @@ class _InformationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, semanticLabel: label),
-            const SizedBox(width: AppSpacing.base),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: Theme.of(context).textTheme.titleLarge),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(value, style: Theme.of(context).textTheme.bodyLarge),
-                ],
-              ),
+    return Semantics(
+      container: true,
+      label: '$label: $value',
+      child: ExcludeSemantics(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.base),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon),
+                const SizedBox(width: AppSpacing.base),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        value,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

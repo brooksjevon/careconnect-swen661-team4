@@ -45,13 +45,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.base),
           children: [
-            Text('Today', style: Theme.of(context).textTheme.headlineLarge),
+            // Screen heading (differs from AppBar so it's kept and marked)
+            Semantics(
+              header: true,
+              child: Text(
+                'Today',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Your reminders and care activities in one place.',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: AppSpacing.lg),
+
             ...items.asMap().entries.map((entry) {
               final index = entry.key;
               final item = entry.value;
@@ -64,7 +72,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     onChanged: (value) {
                       toggleComplete(index, value);
                     },
-                    secondary: Icon(item.icon, semanticLabel: item.title),
+                    // Icon is decorative – the title text already names the task
+                    secondary: ExcludeSemantics(
+                      child: Icon(item.icon),
+                    ),
                     title: Text(item.title),
                     subtitle: Text('${item.time}\n${item.description}'),
                     isThreeLine: true,

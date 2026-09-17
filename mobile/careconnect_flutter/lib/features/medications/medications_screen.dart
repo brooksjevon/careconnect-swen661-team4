@@ -66,9 +66,11 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.base),
           children: [
-            Text(
-              'Medications',
-              style: Theme.of(context).textTheme.headlineLarge,
+            ExcludeSemantics(
+              child: Text(
+                'Medications',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -110,68 +112,99 @@ class _MedicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final statusText =
+        medication.takenToday ? 'Taken today' : 'Not taken yet';
+
+    // Single summary that captures everything visible on the card body.
+    final cardSummary =
+        '${medication.name}. ${medication.dose}. '
+        'Take ${medication.take}. When: ${medication.when}. '
+        '$statusText.';
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.base),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(
-                  Icons.medication_outlined,
-                  size: 32,
-                  semanticLabel: 'Medication',
+            // Focus Stop 1 – the card content, read as one summary
+            Semantics(
+              container: true,
+              label: cardSummary,
+              child: ExcludeSemantics(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.medication_outlined, size: 32),
+                        const SizedBox(width: AppSpacing.base),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                medication.name,
+                                style:
+                                    Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                medication.dose,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.base),
+                    _MedicationField(
+                      label: 'Take',
+                      value: medication.take,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    _MedicationField(
+                      label: 'When',
+                      value: medication.when,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      children: [
+                        Icon(
+                          medication.takenToday
+                              ? Icons.check_circle_outline
+                              : Icons.schedule_outlined,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(
+                            statusText,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.base),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        medication.name,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        medication.dose,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
             const SizedBox(height: AppSpacing.base),
-            _MedicationField(label: 'Take', value: medication.take),
-            const SizedBox(height: AppSpacing.sm),
-            _MedicationField(label: 'When', value: medication.when),
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              children: [
-                Icon(
-                  medication.takenToday
-                      ? Icons.check_circle_outline
-                      : Icons.schedule_outlined,
-                  semanticLabel: medication.takenToday ? 'Taken' : 'Not taken',
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    medication.takenToday ? 'Taken today' : 'Not taken yet',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.base),
+
+            // Focus Stop 2 – the button, separate action
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: onViewDetails,
-                icon: const Icon(Icons.arrow_forward),
-                label: const Text('View Details'),
+              child: Semantics(
+                button: true,
+                hint: 'Opens full details for ${medication.name}',
+                child: OutlinedButton.icon(
+                  onPressed: onViewDetails,
+                  icon: const ExcludeSemantics(
+                    child: Icon(Icons.arrow_forward),
+                  ),
+                  label: const Text('View Details'),
+                ),
               ),
             ),
           ],
@@ -194,11 +227,17 @@ class _MedicationField extends StatelessWidget {
       children: [
         SizedBox(
           width: 72,
-          child: Text(label, style: Theme.of(context).textTheme.titleLarge),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: Text(value, style: Theme.of(context).textTheme.bodyLarge),
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
         ),
       ],
     );

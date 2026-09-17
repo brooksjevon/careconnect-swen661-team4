@@ -76,18 +76,25 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(
-                      Icons.health_and_safety_outlined,
-                      size: 64,
-                      color: theme.colorScheme.primary,
+                    // Decorative icon – hidden from screen readers
+                    ExcludeSemantics(
+                      child: Icon(
+                        Icons.health_and_safety_outlined,
+                        size: 64,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
 
                     const SizedBox(height: 16),
 
-                    Text(
-                      'CareConnect',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineLarge,
+                    // Screen heading
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        'CareConnect',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.headlineLarge,
+                      ),
                     ),
 
                     const SizedBox(height: 8),
@@ -100,7 +107,14 @@ class _SignInScreenState extends State<SignInScreen> {
 
                     const SizedBox(height: 32),
 
-                    Text('I am a...', style: theme.textTheme.headlineMedium),
+                    // Section heading
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        'I am a...',
+                        style: theme.textTheme.headlineMedium,
+                      ),
+                    ),
 
                     const SizedBox(height: 12),
 
@@ -134,7 +148,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         if (value == null || value.trim().isEmpty) {
                           return 'Enter your email.';
                         }
-
                         return null;
                       },
                     ),
@@ -161,6 +174,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             _hidePassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
+                            // Icon is decorative; the button announces via tooltip
+                            semanticLabel: null,
                           ),
                         ),
                         border: const OutlineInputBorder(),
@@ -169,7 +184,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Enter your password.';
                         }
-
                         return null;
                       },
                     ),
@@ -214,6 +228,7 @@ class _RoleCard extends StatelessWidget {
       button: true,
       selected: selected,
       label: '${role.label} sign-in option',
+      hint: selected ? 'Currently selected' : 'Double tap to select',
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -234,7 +249,9 @@ class _RoleCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(role.icon, size: 30, color: theme.colorScheme.primary),
+              ExcludeSemantics(
+                child: Icon(role.icon, size: 30, color: theme.colorScheme.primary),
+              ),
 
               const SizedBox(width: 16),
 
@@ -242,9 +259,11 @@ class _RoleCard extends StatelessWidget {
                 child: Text(role.label, style: theme.textTheme.titleLarge),
               ),
 
-              Icon(
-                selected ? Icons.check_circle : Icons.circle_outlined,
-                color: theme.colorScheme.primary,
+              ExcludeSemantics(
+                child: Icon(
+                  selected ? Icons.check_circle : Icons.circle_outlined,
+                  color: theme.colorScheme.primary,
+                ),
               ),
             ],
           ),
