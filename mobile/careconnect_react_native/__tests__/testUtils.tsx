@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native';
+
 import React from 'react';
 
 import { AppProvider } from '../src/context/AppContext';
@@ -7,7 +8,9 @@ export function renderWithProvider(component: React.ReactElement) {
   return render(<AppProvider>{component}</AppProvider>);
 }
 
-export async function pressItem(item: unknown) {
+export async function pressItem(
+  item: Parameters<typeof fireEvent.press>[0],
+) {
   await act(async () => {
     fireEvent.press(item);
   });
@@ -22,7 +25,10 @@ export async function pressItem(item: unknown) {
   });
 }
 
-export async function typeText(item: unknown, value: string) {
+export async function typeText(
+  item: Parameters<typeof fireEvent.changeText>[0],
+  value: string,
+) {
   await act(async () => {
     fireEvent.changeText(item, value);
   });
