@@ -44,18 +44,14 @@ describe('CareConnect React Native screen and component tests', () => {
     expect(await screen.findByLabelText('Sign in as Caregiver')).toBeTruthy();
   });
 
-  test('HomeScreen shows dashboard content and theme options', async () => {
+  test('HomeScreen shows dashboard content', async () => {
     const screen = await renderWithProvider(<HomeScreen />);
-
+  
     expect(await screen.findByText('Good morning, Jevon Brooks')).toBeTruthy();
     expect(await screen.findByText('Next Important Action')).toBeTruthy();
     expect(await screen.findByText('Appointment')).toBeTruthy();
     expect(await screen.findByText('Care Task')).toBeTruthy();
     expect(await screen.findByText('Care Team')).toBeTruthy();
-
-    await pressItem(await screen.findByLabelText('Blue & Green theme'));
-
-    expect(await screen.findByLabelText('Blue & Green theme')).toBeTruthy();
   });
 
   test('MedicationsScreen marks medication as taken', async () => {

@@ -11,15 +11,16 @@
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
 
-  return {
-    ...RN,
-    AccessibilityInfo: {
-      ...RN.AccessibilityInfo,
+  Object.defineProperty(RN, 'AccessibilityInfo', {
+    configurable: true,
+    value: {
       isScreenReaderEnabled: jest.fn(() => Promise.resolve(false)),
       announceForAccessibility: jest.fn(),
       announceForAccessibilityWithOptions: jest.fn(),
     },
-  };
+  });
+
+  return RN;
 });
 
 jest.mock('react-native-safe-area-context', () => {

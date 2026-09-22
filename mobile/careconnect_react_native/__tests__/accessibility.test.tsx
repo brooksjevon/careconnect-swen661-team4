@@ -126,7 +126,9 @@ describe('accessibilityHint coverage', () => {
 describe('Platform-specific accessibility APIs', () => {
   test('ThemeBackground hides decorative icons from both TalkBack and VoiceOver', async () => {
     const screen = await renderWithProvider(<ThemeBackground variant="home" />);
-    const background = await screen.findByTestId('theme-background');
+    const background = await screen.findByTestId('theme-background', {
+      includeHiddenElements: true,
+    });
 
     expect(background.props.accessible).toBe(false);
     expect(background.props.importantForAccessibility).toBe(
