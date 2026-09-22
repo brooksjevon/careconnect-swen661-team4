@@ -7,11 +7,9 @@ import 'package:careconnect_flutter/features/appointments/screens/appointment_pr
 void main() {
   Future<void> setPhoneSize(WidgetTester tester) async {
     tester.view.physicalSize = const Size(390, 844);
-
     tester.view.devicePixelRatio = 1.0;
 
     addTearDown(tester.view.resetPhysicalSize);
-
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
@@ -28,7 +26,6 @@ void main() {
     await setPhoneSize(tester);
 
     await tester.pumpWidget(const CareConnectApp());
-
     await tester.pumpAndSettle();
 
     final navigationBar = find.byType(NavigationBar);
@@ -43,7 +40,6 @@ void main() {
     expect(destination, findsOneWidget);
 
     await tester.tap(destination);
-
     await tester.pumpAndSettle();
 
     expect(find.text('Your upcoming healthcare visits.'), findsOneWidget);
@@ -57,7 +53,6 @@ void main() {
     expect(prepareButton, findsOneWidget);
 
     await tester.tap(prepareButton);
-
     await tester.pumpAndSettle();
 
     expect(find.byType(AppointmentPreparationScreen), findsOneWidget);
@@ -86,6 +81,7 @@ void main() {
 
     final scrollable = preparationScrollable();
 
+    // Verify the "What to Bring" section.
     final whatToBring = find.text('What to Bring');
 
     await tester.dragUntilVisible(
@@ -98,6 +94,7 @@ void main() {
 
     expect(whatToBring, findsOneWidget);
 
+    // Verify checklist content.
     final photoId = find.text('Photo ID');
 
     await tester.dragUntilVisible(photoId, scrollable, const Offset(0, -150));
@@ -105,9 +102,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(photoId, findsOneWidget);
-
     expect(find.text('Medication list'), findsOneWidget);
 
+    // Move to the questions section.
     final questionsHeading = find.text('Questions to Ask');
 
     await tester.dragUntilVisible(
@@ -120,9 +117,21 @@ void main() {
 
     expect(questionsHeading, findsOneWidget);
 
-    expect(find.text('Is my blood pressure improving?'), findsOneWidget);
+    // Continue scrolling so the question cards are built
+    // and visible within the test viewport.
+    await tester.drag(scrollable, const Offset(0, -300));
 
-    expect(find.text('Do I need any medication changes?'), findsOneWidget);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Question 1: Is my blood pressure improving?'),
+      findsOneWidget,
+    );
+
+    expect(
+      find.text('Question 2: Do I need any medication changes?'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('User can complete appointment preparation', (
@@ -131,7 +140,6 @@ void main() {
     await openPreparation(tester);
 
     final scrollable = preparationScrollable();
-
     final completeButton = find.text('Mark Preparation Complete');
 
     await tester.dragUntilVisible(
@@ -145,7 +153,6 @@ void main() {
     expect(completeButton, findsOneWidget);
 
     await tester.tap(completeButton);
-
     await tester.pumpAndSettle();
 
     expect(find.text('Preparation: Complete'), findsOneWidget);
