@@ -67,8 +67,11 @@ export function ScheduleScreen() {
             </Text>
 
             <Pressable
+              accessible
               accessibilityRole="checkbox"
               accessibilityState={{ checked: completed }}
+              accessibilityLabel={item.title}
+              accessibilityHint="Marks this schedule item as complete or incomplete."
               onPress={() => toggleItem(item.id)}
               style={[styles.checkButton, { borderColor: activeTheme.primary }]}
             >

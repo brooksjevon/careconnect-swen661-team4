@@ -124,8 +124,10 @@ export function HomeScreen() {
         <ReadAloudButton text={heroReadText} label="Read Dashboard Aloud" />
 
         <Pressable
+          accessible
           accessibilityRole="button"
           accessibilityLabel="Switch user"
+          accessibilityHint="Signs out and returns to the sign-in screen."
           onPress={signOut}
           style={[
             styles.secondaryButton,
@@ -165,7 +167,7 @@ export function HomeScreen() {
         />
       </View>
 
-      <Text
+      {/*<Text
         style={[
           styles.sectionTitle,
           {
@@ -184,9 +186,11 @@ export function HomeScreen() {
         return (
           <Pressable
             key={key}
+            accessible
             accessibilityRole="button"
             accessibilityState={{ selected }}
             accessibilityLabel={`${themeValue.name} theme`}
+            accessibilityHint="Applies this color theme throughout the app."
             onPress={() => setSelectedTheme(key)}
             style={[
               styles.themeButton,
@@ -214,7 +218,7 @@ export function HomeScreen() {
             </Text>
           </Pressable>
         );
-      })}
+      })} */}
     </ThemedScreen>
   );
 }

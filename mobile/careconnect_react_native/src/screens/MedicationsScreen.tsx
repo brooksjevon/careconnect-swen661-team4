@@ -7,15 +7,21 @@ import { ThemedScreen } from '../components/ThemedScreen';
 import { useCareConnect } from '../context/AppContext';
 import { medications } from '../data/careData';
 import { spacing, typography } from '../theme/theme';
+import { announceForAccessibility } from '../utils/accessibilityAnnounce';
 
 export function MedicationsScreen() {
   const { activeTheme, textScale } = useCareConnect();
   const [takenIds, setTakenIds] = useState<string[]>([]);
 
-  const markTaken = (id: string) => {
-    setTakenIds((current) =>
-      current.includes(id) ? current : [...current, id],
-    );
+  const markTaken = (id: string, name: string) => {
+    setTakenIds((current) => {
+      if (current.includes(id)) {
+        return current;
+      }
+
+      announceForAccessibility(`${name} marked as taken.`);
+      return [...current, id];
+    });
   };
 
   const pageReadText = medications
@@ -92,6 +98,7 @@ export function MedicationsScreen() {
             </Text>
 
             <Pressable
+              accessible
               accessibilityRole="button"
               accessibilityState={{ disabled: taken }}
               accessibilityLabel={
@@ -99,8 +106,13 @@ export function MedicationsScreen() {
                   ? `${medication.name} already taken today`
                   : `Mark ${medication.name} as taken`
               }
+              accessibilityHint={
+                taken
+                  ? 'This medication has already been marked as taken today.'
+                  : 'Records that you took this medication today.'
+              }
               disabled={taken}
-              onPress={() => markTaken(medication.id)}
+              onPress={() => markTaken(medication.id, medication.name)}
               style={[
                 styles.button,
                 {

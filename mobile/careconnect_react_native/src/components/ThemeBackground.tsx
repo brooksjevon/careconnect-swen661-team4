@@ -46,9 +46,11 @@ export function ThemeBackground({ variant = 'home' }: ThemeBackgroundProps) {
 
   return (
     <View
+      testID="theme-background"
       pointerEvents="none"
       accessible={false}
       importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden
       style={StyleSheet.absoluteFill}
     >
       <View

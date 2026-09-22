@@ -3,6 +3,25 @@
   stop: jest.fn(),
 }));
 
+// AccessibilityInfo.isScreenReaderEnabled() is native and would otherwise
+// resolve on whatever the test host reports (or hang, on some CI setups).
+// Force it to resolve to `false` so tests exercise the same-app
+// text-to-speech / announce paths deterministically, and stub out the
+// announcement APIs so calling them in a test doesn't touch native code.
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+
+  return {
+    ...RN,
+    AccessibilityInfo: {
+      ...RN.AccessibilityInfo,
+      isScreenReaderEnabled: jest.fn(() => Promise.resolve(false)),
+      announceForAccessibility: jest.fn(),
+      announceForAccessibilityWithOptions: jest.fn(),
+    },
+  };
+});
+
 jest.mock('react-native-safe-area-context', () => {
   const React = require('react');
   const { View } = require('react-native');

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { AccessibleCard } from '../components/AccessibleCard';
@@ -7,6 +7,7 @@ import { ThemedScreen } from '../components/ThemedScreen';
 import { useCareConnect } from '../context/AppContext';
 import { appointments } from '../data/careData';
 import { spacing, typography } from '../theme/theme';
+import { announceForAccessibility } from '../utils/accessibilityAnnounce';
 
 export function AppointmentsScreen() {
   const { activeTheme, textScale } = useCareConnect();
@@ -16,6 +17,19 @@ export function AppointmentsScreen() {
   const allChecked = appointment.prepItems.every((item) =>
     checkedIds.includes(item.id),
   );
+
+  // Announce the status change directly rather than relying on the user
+  // to scroll down to the status text after checking the last item.
+  const previousAllChecked = useRef(allChecked);
+
+  useEffect(() => {
+    if (allChecked !== previousAllChecked.current) {
+      announceForAccessibility(
+        allChecked ? 'Preparation complete.' : 'Preparation not complete.',
+      );
+      previousAllChecked.current = allChecked;
+    }
+  }, [allChecked]);
 
   const togglePrep = (id: string) => {
     setCheckedIds((current) =>
@@ -75,8 +89,11 @@ export function AppointmentsScreen() {
           return (
             <Pressable
               key={item.id}
+              accessible
               accessibilityRole="checkbox"
               accessibilityState={{ checked }}
+              accessibilityLabel={item.label}
+              accessibilityHint="Marks this preparation item as complete or incomplete."
               onPress={() => togglePrep(item.id)}
               style={[styles.checkRow, { borderColor: activeTheme.border }]}
             >
@@ -97,6 +114,7 @@ export function AppointmentsScreen() {
         })}
 
         <Text
+          accessibilityLiveRegion="polite"
           style={[
             styles.status,
             { color: allChecked ? activeTheme.success : activeTheme.error },

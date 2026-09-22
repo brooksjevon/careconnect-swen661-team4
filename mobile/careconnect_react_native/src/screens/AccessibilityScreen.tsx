@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, Text } from 'react-native';
 
 import { AccessibleCard } from '../components/AccessibleCard';
 import { ReadAloudButton } from '../components/ReadAloudButton';
@@ -62,9 +62,11 @@ export function AccessibilityScreen() {
           return (
             <Pressable
               key={key}
+              accessible
               accessibilityRole="button"
               accessibilityState={{ selected }}
               accessibilityLabel={`${themeValue.name} theme`}
+              accessibilityHint="Applies this color theme throughout the app."
               onPress={() => setSelectedTheme(key)}
               style={[
                 styles.option,
@@ -106,9 +108,11 @@ export function AccessibilityScreen() {
           return (
             <Pressable
               key={item.label}
+              accessible
               accessibilityRole="button"
               accessibilityState={{ selected }}
               accessibilityLabel={`${item.label} text size`}
+              accessibilityHint="Changes the text size used throughout the app."
               onPress={() => setTextScale(item.value)}
               style={[
                 styles.option,
@@ -143,7 +147,15 @@ export function AccessibilityScreen() {
         title="Reading Support"
         readAloudText="Reading Support. Wider spacing and read aloud assistance can be turned on or off."
       >
-        <View style={styles.switchRow}>
+        <Pressable
+          accessible
+          accessibilityRole="switch"
+          accessibilityState={{ checked: wideSpacing }}
+          accessibilityLabel="Wider spacing"
+          accessibilityHint="Increases spacing between items on every screen for easier reading."
+          onPress={() => setWideSpacing(!wideSpacing)}
+          style={styles.switchRow}
+        >
           <Text
             style={[
               styles.switchText,
@@ -157,13 +169,23 @@ export function AccessibilityScreen() {
           </Text>
 
           <Switch
-            accessibilityLabel="Wider spacing"
             value={wideSpacing}
             onValueChange={setWideSpacing}
+            pointerEvents="none"
+            importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden
           />
-        </View>
+        </Pressable>
 
-        <View style={styles.switchRow}>
+        <Pressable
+          accessible
+          accessibilityRole="switch"
+          accessibilityState={{ checked: readAloudEnabled }}
+          accessibilityLabel="Read aloud assistance"
+          accessibilityHint="Turns on read aloud support for screen content."
+          onPress={() => setReadAloudEnabled(!readAloudEnabled)}
+          style={styles.switchRow}
+        >
           <Text
             style={[
               styles.switchText,
@@ -177,11 +199,13 @@ export function AccessibilityScreen() {
           </Text>
 
           <Switch
-            accessibilityLabel="Read aloud assistance"
             value={readAloudEnabled}
             onValueChange={setReadAloudEnabled}
+            pointerEvents="none"
+            importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden
           />
-        </View>
+        </Pressable>
       </AccessibleCard>
     </ThemedScreen>
   );

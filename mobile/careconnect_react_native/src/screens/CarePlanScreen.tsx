@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { AccessibleCard } from '../components/AccessibleCard';
@@ -7,6 +7,7 @@ import { ThemedScreen } from '../components/ThemedScreen';
 import { useCareConnect } from '../context/AppContext';
 import { careTasks } from '../data/careData';
 import { spacing, typography } from '../theme/theme';
+import { announceForAccessibility } from '../utils/accessibilityAnnounce';
 import { canFinishCareTask } from '../utils/careLogic';
 
 export function CarePlanScreen() {
@@ -14,6 +15,22 @@ export function CarePlanScreen() {
   const task = careTasks[0];
   const [completedStepIds, setCompletedStepIds] = useState<string[]>([]);
   const complete = canFinishCareTask(completedStepIds, task);
+
+  // Tell screen reader users the moment the Finish Instructions button
+  // becomes usable, since its own disabled state won't be re-announced
+  // unless it currently has focus.
+  const previousComplete = useRef(complete);
+
+  useEffect(() => {
+    if (complete !== previousComplete.current) {
+      announceForAccessibility(
+        complete
+          ? 'All steps complete. Finish Instructions button is now enabled.'
+          : 'Finish Instructions button is disabled until all steps are complete.',
+      );
+      previousComplete.current = complete;
+    }
+  }, [complete]);
 
   const toggleStep = (stepId: string) => {
     setCompletedStepIds((current) =>
@@ -59,8 +76,11 @@ export function CarePlanScreen() {
           return (
             <Pressable
               key={stepId}
+              accessible
               accessibilityRole="checkbox"
               accessibilityState={{ checked }}
+              accessibilityLabel={`Step ${index + 1}: ${instruction}`}
+              accessibilityHint="Marks this care step as complete or incomplete."
               onPress={() => toggleStep(stepId)}
               style={[styles.stepRow, { borderColor: activeTheme.border }]}
             >
@@ -81,8 +101,17 @@ export function CarePlanScreen() {
         })}
 
         <Pressable
+          accessible
           accessibilityRole="button"
           accessibilityState={{ disabled: !complete }}
+          accessibilityLabel={
+            complete ? 'Finish Instructions' : 'Finish Instructions Disabled'
+          }
+          accessibilityHint={
+            complete
+              ? 'Marks the care task as finished.'
+              : 'Complete all steps above to enable this button.'
+          }
           disabled={!complete}
           style={[
             styles.button,

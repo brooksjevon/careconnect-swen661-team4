@@ -1,9 +1,10 @@
 ﻿import React from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { AccessibilityInfo, Pressable, StyleSheet, Text } from 'react-native';
 import * as Speech from 'expo-speech';
 
 import { useCareConnect } from '../context/AppContext';
 import { spacing, typography } from '../theme/theme';
+import { announceForAccessibility } from '../utils/accessibilityAnnounce';
 
 type ReadAloudButtonProps = {
   text: string;
@@ -16,8 +17,19 @@ export function ReadAloudButton({
 }: ReadAloudButtonProps) {
   const { activeTheme, textScale } = useCareConnect();
 
-  const speak = () => {
+  const speak = async () => {
     Speech.stop();
+
+    // If VoiceOver or TalkBack is already running, hand the text to it
+    // instead of layering our own text-to-speech voice on top, which
+    // would talk over the screen reader at the same time.
+    const screenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+
+    if (screenReaderEnabled) {
+      announceForAccessibility(text);
+      return;
+    }
+
     Speech.speak(text, {
       rate: 0.85,
       pitch: 1,
@@ -26,8 +38,10 @@ export function ReadAloudButton({
 
   return (
     <Pressable
+      accessible
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityHint="Speaks this screen's content aloud using text to speech."
       onPress={speak}
       style={[
         styles.button,

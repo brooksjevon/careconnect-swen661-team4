@@ -1,16 +1,10 @@
 ﻿import { afterEach, describe, expect, jest, test } from '@jest/globals';
-import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
-} from '@testing-library/react-native';
+import { cleanup } from '@testing-library/react-native';
 import React from 'react';
 import * as Speech from 'expo-speech';
 
 import { AccessibleCard } from '../src/components/AccessibleCard';
 import { ReadAloudButton } from '../src/components/ReadAloudButton';
-import { AppProvider } from '../src/context/AppContext';
 import { AccessibilityScreen } from '../src/screens/AccessibilityScreen';
 import { AppointmentsScreen } from '../src/screens/AppointmentsScreen';
 import { CarePlanScreen } from '../src/screens/CarePlanScreen';
@@ -19,22 +13,7 @@ import { MedicationsScreen } from '../src/screens/MedicationsScreen';
 import { MyHealthScreen } from '../src/screens/MyHealthScreen';
 import { ScheduleScreen } from '../src/screens/ScheduleScreen';
 import { SignInScreen } from '../src/screens/SignInScreen';
-
-function renderWithProvider(component: React.ReactElement) {
-  return render(<AppProvider>{component}</AppProvider>);
-}
-
-async function pressItem(item: unknown) {
-  await act(async () => {
-    fireEvent.press(item);
-  });
-}
-
-async function typeText(item: unknown, value: string) {
-  await act(async () => {
-    fireEvent.changeText(item, value);
-  });
-}
+import { pressItem, renderWithProvider, typeText } from './testUtils';
 
 afterEach(async () => {
   await cleanup();

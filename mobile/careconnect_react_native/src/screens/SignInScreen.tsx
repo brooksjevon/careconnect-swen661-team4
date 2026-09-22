@@ -11,6 +11,7 @@ import { ThemedScreen } from '../components/ThemedScreen';
 import { useCareConnect } from '../context/AppContext';
 import { CareConnectRole } from '../models/types';
 import { spacing, typography } from '../theme/theme';
+import { announceForAccessibility } from '../utils/accessibilityAnnounce';
 
 const roles: CareConnectRole[] = ['patient', 'caregiver', 'provider'];
 
@@ -33,6 +34,18 @@ export function SignInScreen() {
   const submit = () => {
     if (!email.trim() || !password.trim()) {
       setShowErrors(true);
+
+      // The error text below appears near the field, but a screen reader
+      // user's focus is still on the Sign In button, so announce the
+      // problem directly rather than relying on them to discover it.
+      if (!email.trim() && !password.trim()) {
+        announceForAccessibility('Enter your email and password.');
+      } else if (!email.trim()) {
+        announceForAccessibility('Enter your email.');
+      } else {
+        announceForAccessibility('Enter your password.');
+      }
+
       return;
     }
 
@@ -89,9 +102,11 @@ export function SignInScreen() {
         return (
           <Pressable
             key={role}
+            accessible
             accessibilityRole="button"
             accessibilityState={{ selected }}
             accessibilityLabel={`${roleLabels[role]} sign-in option`}
+            accessibilityHint={`Signs in as a ${roleLabels[role].toLowerCase()}.`}
             onPress={() => setSelectedRole(role)}
             style={[
               styles.roleButton,
@@ -123,7 +138,9 @@ export function SignInScreen() {
       })}
 
       <TextInput
+        accessible
         accessibilityLabel="Email"
+        accessibilityHint="Enter the email address for your account."
         placeholder="Email"
         placeholderTextColor={activeTheme.mutedText}
         autoCapitalize="none"
@@ -144,6 +161,7 @@ export function SignInScreen() {
       {showErrors && !email.trim() ? (
         <Text
           accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
           style={[styles.error, { color: activeTheme.error }]}
         >
           Enter your email.
@@ -151,7 +169,9 @@ export function SignInScreen() {
       ) : null}
 
       <TextInput
+        accessible
         accessibilityLabel="Password"
+        accessibilityHint="Enter your account password."
         placeholder="Password"
         placeholderTextColor={activeTheme.mutedText}
         secureTextEntry
@@ -171,6 +191,7 @@ export function SignInScreen() {
       {showErrors && !password.trim() ? (
         <Text
           accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
           style={[styles.error, { color: activeTheme.error }]}
         >
           Enter your password.
@@ -178,8 +199,10 @@ export function SignInScreen() {
       ) : null}
 
       <Pressable
+        accessible
         accessibilityRole="button"
         accessibilityLabel={`Sign in as ${roleLabels[selectedRole]}`}
+        accessibilityHint="Submits the sign-in form and continues to the app."
         onPress={submit}
         style={[
           styles.primaryButton,
