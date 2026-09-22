@@ -45,51 +45,85 @@ class MyHealthScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.base),
           children: [
-            Text('My Health', style: Theme.of(context).textTheme.headlineLarge),
+            // Visual heading only – AppBar already announces "My Health"
+            ExcludeSemantics(
+              child: Text(
+                'My Health',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Important health information in one place.',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: AppSpacing.lg),
+
+            // Health Summary card – heading + one merged summary
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.base),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Health Summary',
-                      style: Theme.of(context).textTheme.titleLarge,
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        'Health Summary',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.base),
-                    Text(
-                      '2 current medications',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      '1 upcoming appointment',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      '3 care activities today',
-                      style: Theme.of(context).textTheme.bodyLarge,
+                    Semantics(
+                      container: true,
+                      label:
+                          '2 current medications. '
+                          '1 upcoming appointment. '
+                          '3 care activities today.',
+                      child: ExcludeSemantics(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '2 current medications',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              '1 upcoming appointment',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              '3 care activities today',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
+
             const SizedBox(height: AppSpacing.lg),
+
+            // Accessibility button
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  openAccessibility(context);
-                },
-                icon: const Icon(Icons.accessibility_new),
-                label: const Text('Accessibility & Appearance'),
+              child: Semantics(
+                button: true,
+                hint: 'Opens accessibility and appearance settings',
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    openAccessibility(context);
+                  },
+                  icon: const ExcludeSemantics(
+                    child: Icon(Icons.accessibility_new),
+                  ),
+                  label: const Text('Accessibility & Appearance'),
+                ),
               ),
             ),
           ],

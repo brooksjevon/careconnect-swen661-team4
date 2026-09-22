@@ -37,9 +37,13 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.base),
           children: [
-            Text(
-              'Appointments',
-              style: Theme.of(context).textTheme.headlineLarge,
+            // Screen heading
+            Semantics(
+              header: true,
+              child: Text(
+                'Appointments',
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -53,11 +57,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Appointment title row – icon is decorative
                     Row(
                       children: [
-                        const Icon(
-                          Icons.calendar_month_outlined,
-                          semanticLabel: 'Appointment',
+                        const ExcludeSemantics(
+                          child: Icon(Icons.calendar_month_outlined),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
@@ -83,37 +87,46 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: AppSpacing.base),
-                    Row(
-                      children: [
-                        Icon(
-                          preparationComplete
-                              ? Icons.check_circle_outline
-                              : Icons.schedule_outlined,
-                          semanticLabel: preparationComplete
-                              ? 'Preparation complete'
-                              : 'Preparation not complete',
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Text(
-                            preparationComplete
-                                ? 'Preparation: Complete'
-                                : 'Preparation: Not complete',
-                            style: Theme.of(context).textTheme.bodyMedium,
+
+                    // Status row – merged so the icon and text read as one
+                    MergeSemantics(
+                      child: Row(
+                        children: [
+                          ExcludeSemantics(
+                            child: Icon(
+                              preparationComplete
+                                  ? Icons.check_circle_outline
+                                  : Icons.schedule_outlined,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              preparationComplete
+                                  ? 'Preparation: Complete'
+                                  : 'Preparation: Not complete',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.base),
+
+                    // Preparation button – adds a hint for screen readers
                     SizedBox(
                       width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: openPreparation,
-                        icon: const Icon(Icons.assignment_outlined),
-                        label: Text(
-                          preparationComplete
-                              ? 'Review Preparation'
-                              : 'Prepare for Appointment',
+                      child: Semantics(
+                        button: true,
+                        hint: 'Opens preparation checklist',
+                        child: OutlinedButton.icon(
+                          onPressed: openPreparation,
+                          icon: const Icon(Icons.assignment_outlined),
+                          label: Text(
+                            preparationComplete
+                                ? 'Review Preparation'
+                                : 'Prepare for Appointment',
+                          ),
                         ),
                       ),
                     ),

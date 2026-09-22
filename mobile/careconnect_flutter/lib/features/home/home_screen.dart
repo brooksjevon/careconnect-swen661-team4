@@ -23,19 +23,36 @@ class HomeScreen extends StatelessWidget {
     required this.onThemeChanged,
   });
 
+  /// Expands abbreviations so screen readers announce them correctly.
+  /// "Dr." would otherwise be read as "drive".
+  String _expandAbbreviations(String input) {
+    return input
+        .replaceAll(RegExp(r'\bDr\.\s*'), 'Doctor ')
+        .replaceAll(RegExp(r'\bMr\.\s*'), 'Mister ')
+        .replaceAll(RegExp(r'\bMrs\.\s*'), 'Missus ')
+        .replaceAll(RegExp(r'\bMs\.\s*'), 'Miss ')
+        .replaceAll(RegExp(r'\bSt\.\s*'), 'Street ');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('CareConnect'),
         actions: [
-          TextButton.icon(
-            onPressed: () {
-              _showThemeSelector(context);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.white),
-            icon: const Icon(Icons.palette_outlined),
-            label: const Text('Theme'),
+          Semantics(
+            button: true,
+            hint: 'Opens the theme selector',
+            child: TextButton.icon(
+              onPressed: () {
+                _showThemeSelector(context);
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
+              icon: const ExcludeSemantics(
+                child: Icon(Icons.palette_outlined),
+              ),
+              label: const Text('Theme'),
+            ),
           ),
           const SizedBox(width: AppSpacing.xs),
           IconButton(
@@ -83,18 +100,24 @@ class HomeScreen extends StatelessWidget {
 
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (context) {
-                        return const ScheduleScreen();
-                      },
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.calendar_view_day_outlined),
-                label: const Text('View Schedule'),
+              child: Semantics(
+                button: true,
+                hint: 'Opens your full schedule',
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (context) {
+                          return const ScheduleScreen();
+                        },
+                      ),
+                    );
+                  },
+                  icon: const ExcludeSemantics(
+                    child: Icon(Icons.calendar_view_day_outlined),
+                  ),
+                  label: const Text('View Schedule'),
+                ),
               ),
             ),
 
@@ -118,18 +141,21 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AspectRatio(
-            aspectRatio: 2,
-            child: Image.asset(
-              ThemePhotoAsset.forTheme(selectedTheme),
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return SvgPicture.asset(
-                  ThemePreviewAsset.forTheme(selectedTheme),
-                  fit: BoxFit.cover,
-                );
-              },
+          // Decorative hero image – hidden from screen readers
+          ExcludeSemantics(
+            child: AspectRatio(
+              aspectRatio: 2,
+              child: Image.asset(
+                ThemePhotoAsset.forTheme(selectedTheme),
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return SvgPicture.asset(
+                    ThemePreviewAsset.forTheme(selectedTheme),
+                    fit: BoxFit.cover,
+                  );
+                },
+              ),
             ),
           ),
 
@@ -153,12 +179,14 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _sectionHeading(BuildContext context, String title) {
-    return Text(title, style: Theme.of(context).textTheme.headlineMedium);
+    return Semantics(
+      header: true,
+      child: Text(title, style: Theme.of(context).textTheme.headlineMedium),
+    );
   }
 
   Widget _buildNextActionCard(BuildContext context) {
     final tokens = Theme.of(context).extension<CareThemeTokens>()!;
-
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -176,17 +204,18 @@ class HomeScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: tokens.accent.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Icons.medication_outlined,
-                  color: colorScheme.primary,
-                  semanticLabel: 'Medication',
+              ExcludeSemantics(
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: tokens.accent.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Icons.medication_outlined,
+                    color: colorScheme.primary,
+                  ),
                 ),
               ),
 
@@ -221,16 +250,22 @@ class HomeScreen extends StatelessWidget {
 
           SizedBox(
             width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Medication details will open here.'),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text('View Medication'),
+            child: Semantics(
+              button: true,
+              hint: 'Opens the medication details',
+              child: FilledButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Medication details will open here.'),
+                    ),
+                  );
+                },
+                icon: const ExcludeSemantics(
+                  child: Icon(Icons.arrow_forward),
+                ),
+                label: const Text('View Medication'),
+              ),
             ),
           ),
         ],
@@ -239,117 +274,137 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildAppointmentCard(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Semantics(
+      container: true,
+      label:
+          'Appointment: Doctor Patel. Monday, August 31 at 10:30 AM. Purpose: Blood pressure follow-up.',
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.base),
+          child: ExcludeSemantics(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.calendar_month_outlined,
-                  semanticLabel: 'Appointment',
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_month_outlined),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      'Appointment',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.sm),
+                const SizedBox(height: AppSpacing.base),
                 Text(
-                  'Appointment',
+                  'Dr. Patel',
                   style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Monday, August 31',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                Text(
+                  '10:30 AM',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Purpose: Blood pressure follow-up',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.base),
-            Text('Dr. Patel', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Monday, August 31',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            Text('10:30 AM', style: Theme.of(context).textTheme.bodyLarge),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Purpose: Blood pressure follow-up',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildCareTaskCard(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(Icons.checklist_outlined, semanticLabel: 'Care task'),
-            const SizedBox(width: AppSpacing.base),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Care Task',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Morning medication',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
+    return Semantics(
+      container: true,
+      label:
+          'Care task: Morning medication. Status: Complete.',
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.base),
+          child: ExcludeSemantics(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.checklist_outlined),
+                const SizedBox(width: AppSpacing.base),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.check_circle_outline,
-                        semanticLabel: 'Complete',
+                      Text(
+                        'Care Task',
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          'Status: Complete',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Morning medication',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Row(
+                        children: [
+                          const Icon(Icons.check_circle_outline),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Text(
+                              'Status: Complete',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildReminderCard(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(Icons.notifications_outlined, semanticLabel: 'Reminder'),
-            const SizedBox(width: AppSpacing.base),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Reminder',
-                    style: Theme.of(context).textTheme.titleLarge,
+    return Semantics(
+      container: true,
+      label: 'Reminder: Your appointment is tomorrow at 10:30 AM.',
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.base),
+          child: ExcludeSemantics(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.notifications_outlined),
+                const SizedBox(width: AppSpacing.base),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Reminder',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Your appointment is tomorrow at 10:30 AM.',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Your appointment is tomorrow at 10:30 AM.',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -360,18 +415,26 @@ class HomeScreen extends StatelessWidget {
     required String label,
     required String value,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 72,
-          child: Text(label, style: Theme.of(context).textTheme.titleLarge),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Text(value, style: Theme.of(context).textTheme.bodyLarge),
-        ),
-      ],
+    return MergeSemantics(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 72,
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -388,9 +451,12 @@ class HomeScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Choose Your Theme',
-                  style: Theme.of(context).textTheme.headlineMedium,
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'Choose Your Theme',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
                 ),
 
                 const SizedBox(height: AppSpacing.sm),
@@ -477,30 +543,33 @@ class _ThemeOptionTile extends StatelessWidget {
       button: true,
       selected: selected,
       label: '$label theme',
-      child: ListTile(
-        minVerticalPadding: AppSpacing.sm,
-        contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        onTap: onTap,
+      hint: selected ? 'Currently selected' : 'Double tap to select',
+      child: ExcludeSemantics(
+        child: ListTile(
+          minVerticalPadding: AppSpacing.sm,
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          onTap: onTap,
 
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: SvgPicture.asset(
-            ThemePreviewAsset.forTheme(theme),
-            width: 82,
-            height: 48,
-            fit: BoxFit.cover,
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SvgPicture.asset(
+              ThemePreviewAsset.forTheme(theme),
+              width: 82,
+              height: 48,
+              fit: BoxFit.cover,
+            ),
           ),
+
+          title: Text(label, style: Theme.of(context).textTheme.titleLarge),
+
+          trailing: selected
+              ? Icon(
+                  Icons.check_circle,
+                  color: Theme.of(context).colorScheme.primary,
+                )
+              : const Icon(Icons.circle_outlined),
         ),
-
-        title: Text(label, style: Theme.of(context).textTheme.titleLarge),
-
-        trailing: selected
-            ? Icon(
-                Icons.check_circle,
-                color: Theme.of(context).colorScheme.primary,
-                semanticLabel: 'Selected',
-              )
-            : const Icon(Icons.circle_outlined, semanticLabel: 'Not selected'),
       ),
     );
   }
