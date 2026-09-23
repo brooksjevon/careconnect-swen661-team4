@@ -601,9 +601,9 @@ Remaining manual submission evidence includes the required TalkBack and VoiceOve
 
 | Team Member | Contribution |
 | --- | --- |
-| Jonay Simmons | [Part 1] |
+| Matthew Spano | [Part 1] |
 | Stephane Aloys Tekam Nwafor | [Part 2] |
-| Jevon Brooks | [Part 2 & 3] |
+| Jevon Brooks | [Part 3 & 4] |
 
 ---
 
