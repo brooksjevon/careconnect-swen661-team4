@@ -1,0 +1,4 @@
+import { Link, useNavigate } from 'react-router-dom'
+import AuthLayout from '../../layouts/AuthLayout'
+import { Button } from '../../components/UI'
+export default function SignUp(){const nav=useNavigate();return <AuthLayout><div className="auth-form"><h1>Create your account</h1><p>Set up CareConnect in under two minutes.</p><label htmlFor="signup-name">Full name *</label><input id="signup-name" defaultValue="Margaret"/><label htmlFor="signup-email">Email address *</label><input id="signup-email" placeholder="you@example.com"/><label htmlFor="signup-password">Password *</label><input id="signup-password" type="password"/><Button tone="primary" onClick={()=>nav('/choose-role')}>Create free account</Button><hr/><p className="center">Already registered? <Link to="/signin">Sign in</Link></p></div></AuthLayout>}

@@ -1,0 +1,4 @@
+import AppLayout from '../../layouts/AppLayout'
+import { Card, PageTitle, Badge } from '../../components/UI'
+const cards=[['Ellen','Family'],['Sunday roast','Memory'],['Blackpool 1962','Place'],['My garden','Hobby'],['Belle the cat','Pet']]
+export default function Memories(){return <AppLayout><PageTitle title="Memories" subtitle="People, places, and moments that matter to you"/><div className="filters">{['All','Family','Places','Memories','Hobbies','Pets'].map((x,i)=><button className={i===0?'selected':''} key={x}>{x}</button>)}</div><h3 className="section-label">PINNED</h3><div className="memory-grid">{cards.map(c=><Card className="memory-card" key={c[0]}><div className="memory-image">▧</div><div className="memory-body"><h3>{c[0]}</h3><Badge>{c[1]}</Badge></div></Card>)}</div></AppLayout>}
