@@ -117,4 +117,6 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+# Node.js dependencies
 node_modules
+**/desktop/careconnect-electron-react/node_modules
