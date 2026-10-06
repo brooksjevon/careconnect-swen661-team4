@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareConnect Desktop — Today</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="app-layout">
+
+  <!-- ═══ Header ═══ -->
+  <header class="header">
+    <a href="landing.html" class="logo">
+      <span class="logo-icon" aria-hidden="true">💙</span>
+      <span class="logo-text">Care<span class="logo-accent">Connect</span></span>
+    </a>
+    <div class="header-right">
+      <span class="header-date">Tuesday, 24 September · 10:42 am</span>
+      <span class="chip chip-patient">Patient</span>
+      <span class="avatar avatar-patient">M</span>
+      <span class="user-name">Margaret</span>
+    </div>
+  </header>
+
+  <!-- ═══ Body ═══ -->
+  <div class="app-body">
+
+    <aside class="sidebar" aria-label="Main navigation">
+      <nav>
+        <a href="today.html" class="nav-item nav-active">Today</a>
+        <a href="medications.html" class="nav-item">Medications</a>
+        <a href="#" class="nav-item">Schedule</a>
+        <a href="#" class="nav-item">Appointments</a>
+        <a href="#" class="nav-item">Memories</a>
+        <a href="#" class="nav-item">Contacts</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+
+      <section class="banner">
+        <div class="banner-icon" aria-hidden="true">☀️</div>
+        <div>
+          <h1 class="banner-title">Good morning, Margaret!</h1>
+          <p class="banner-sub">Today is Tuesday, 24 September. Here is your day at a glance.</p>
+        </div>
+      </section>
+
+      <section class="stats-row" aria-label="Today's summary">
+        <div class="stat-card">
+          <span class="stat-label">Tasks done</span>
+          <span class="stat-value stat-success">2 / 6</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Medicines left</span>
+          <span class="stat-value stat-warm">3</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Appointments</span>
+          <span class="stat-value stat-calm">1</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Memory cards</span>
+          <span class="stat-value stat-neutral">6</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">📅 What's next today</h2>
+          <a href="#" class="section-link">See full day →</a>
+        </div>
+
+        <div class="task-card">
+          <span class="task-emoji" aria-hidden="true">🍽</span>
+          <div class="task-body">
+            <p class="task-title">Breakfast</p>
+            <p class="task-desc">Porridge with berries, plus a cup of tea</p>
+          </div>
+          <span class="task-time">8:30 am</span>
+        </div>
+
+        <div class="task-card">
+          <span class="task-emoji" aria-hidden="true">🌿</span>
+          <div class="task-body">
+            <p class="task-title">Morning walk</p>
+            <p class="task-desc">Around the garden, 15 minutes</p>
+          </div>
+          <span class="task-time">10:30 am</span>
+        </div>
+
+        <div class="task-card">
+          <span class="task-emoji" aria-hidden="true">🍽</span>
+          <div class="task-body">
+            <p class="task-title">Lunch</p>
+            <p class="task-desc">Sandwich and fruit</p>
+          </div>
+          <span class="task-time">12:30 pm</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Quick links</h2>
+        <div class="quick-grid">
+          <a href="medications.html" class="quick-tile quick-calm">
+            <span class="quick-icon" aria-hidden="true">💊</span>
+            <span>Medicines</span>
+          </a>
+          <a href="#" class="quick-tile quick-warm">
+            <span class="quick-icon" aria-hidden="true">📅</span>
+            <span>Appointments</span>
+          </a>
+          <a href="#" class="quick-tile quick-success">
+            <span class="quick-icon" aria-hidden="true">📖</span>
+            <span>Memories</span>
+          </a>
+          <a href="#" class="quick-tile quick-neutral">
+            <span class="quick-icon" aria-hidden="true">📞</span>
+            <span>Contacts</span>
+          </a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</body>
+</html>
