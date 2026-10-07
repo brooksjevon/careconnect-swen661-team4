@@ -388,8 +388,8 @@ Manual accessibility verification included:
 - Keyboard-only navigation using Tab, Shift+Tab, Enter, Space, and application shortcuts.
 - Visible focus indicators during keyboard navigation.
 - Screen-reader verification using VoiceOver on macOS.
-- Increased-contrast verification on macOS.
-- Windows-specific `forced-colors` support is implemented for Windows Contrast Themes.
+- Increased-contrast verification on macOS and manual Windows High Contrast verification on the installed Windows build.
+- Windows-specific `forced-colors` support was manually verified with Windows High Contrast enabled.
 - Semantic navigation, form labels, route announcements, and reduced-motion support are included in the application.
 
 See `ACCESSIBILITY_TEST_PLAN.md` for the Windows accessibility acceptance-test procedure.
