@@ -257,9 +257,7 @@ Added in this build:
 - reduced-motion support
 - `ACCESSIBILITY_TEST_PLAN.md` for manual Windows verification with NVDA and Contrast Themes
 
-Note: NVDA and Windows Contrast Themes require a real Windows accessibility acceptance test.
-The project includes the implementation and test procedure, but does not claim a manual test
-was performed inside this build environment.
+Manual accessibility verification was performed using keyboard-only navigation and visible focus indicators. Screen-reader behavior was manually verified with VoiceOver on macOS, and increased-contrast behavior was also manually checked on macOS. Windows-specific NVDA and Contrast Theme procedures remain documented in ACCESSIBILITY_TEST_PLAN.md.
 
 ## Unit tests
 
@@ -319,3 +317,97 @@ start .\coverage\integration\lcov-report\index.html
 ```
 
 The report covers the Electron main/preload integration code and is written under `coverage/integration/`.
+
+## Assignment 8 Final Verification
+
+The CareConnect Electron desktop application was verified on Windows x64 on October 6, 2026.
+
+### Automated verification
+
+The following command was used for the final quality check:
+
+```powershell
+npm run check
+
+```
+
+Final results:
+
+- ESLint: Passed with zero lint warnings/errors
+- Jest / React Testing Library: 11 test suites passed
+- Unit and component tests: 50/50 passed
+- Electron integration tests: 2 test suites passed
+- Integration tests: 6/6 passed
+- Vite production build: Passed
+
+### Code coverage
+
+Generate the unit/component coverage report with:
+
+```powershell
+npm run test:coverage
+```
+
+Final measured coverage:
+
+- Statements: 90.90% (250/275)
+- Branches: 86.44% (153/177)
+- Functions: 90.62% (87/96)
+- Lines: 95.59% (152/159)
+
+All reported coverage metrics exceed the Assignment 8 minimum requirement of 60%.
+
+The HTML coverage report is generated at:
+
+```text
+coverage/lcov-report/index.html
+```
+
+On Windows, open it with:
+
+```powershell
+start .\coverage\lcov-report\index.html
+```
+
+### Manual desktop verification
+
+The following Electron desktop functionality was manually verified:
+
+- CareConnect launches successfully as a native desktop application.
+- Native File, Edit, View, and Help menus are available on Windows.
+- Keyboard-only navigation works throughout the application.
+- `Ctrl+/` opens the Keyboard Navigation reference.
+- Visible focus indicators are displayed during keyboard navigation.
+- Window size and position are restored after closing and relaunching the application.
+- The React renderer loads and navigation operates correctly.
+
+### Accessibility verification
+
+Manual accessibility verification included:
+
+- Keyboard-only navigation using Tab, Shift+Tab, Enter, Space, and application shortcuts.
+- Visible focus indicators during keyboard navigation.
+- Screen-reader verification using VoiceOver on macOS.
+- Increased-contrast verification on macOS.
+- Windows-specific `forced-colors` support is implemented for Windows Contrast Themes.
+- Semantic navigation, form labels, route announcements, and reduced-motion support are included in the application.
+
+See `ACCESSIBILITY_TEST_PLAN.md` for the Windows accessibility acceptance-test procedure.
+
+### Windows x64 installer verification
+
+The final Windows x64 installer was generated natively on Windows with:
+
+```powershell
+npm run dist:win
+```
+
+The resulting NSIS installer is:
+
+```text
+release/CareConnect-Setup-1.0.0-x64.exe
+```
+
+The installer was manually executed on Windows. CareConnect installed successfully and the installed application launched successfully.
+
+The Windows installer is distributed separately as a submission artifact and generated build output is not committed to the source repository.
