@@ -18,7 +18,12 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile('screens/landing.html');
+  // In dev mode, load the Vite dev server; in packaged mode, load the built dist/
+  if (!app.isPackaged) {
+    mainWindow.loadURL('http://localhost:5173');
+  } else {
+    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+  }
 }
 
 function buildMenu() {
