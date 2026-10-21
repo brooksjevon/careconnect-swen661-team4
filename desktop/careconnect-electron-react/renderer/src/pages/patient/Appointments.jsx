@@ -1,0 +1,4 @@
+import AppLayout from '../../layouts/AppLayout'
+import { Card, PageTitle, Badge, Button, SectionLabel } from '../../components/UI'
+import { appointments } from '../../data/mockData'
+export default function Appointments(){const [first,...rest]=appointments;return <AppLayout><PageTitle title="My Appointments" subtitle="Upcoming visits, tests, and calls — all in one place"/><SectionLabel>📅 TODAY &nbsp; Tuesday, 24 September</SectionLabel><Card className="featured-appointment"><div className="between"><h2>{first.title}</h2><Badge>Today</Badge></div><h3>{first.when}</h3><p>{first.location}</p><div className="carer-strip">Maria is taking you to this appointment</div></Card><SectionLabel>LATER THIS WEEK</SectionLabel><div className="two-col">{rest.map(a=><Card key={a.title}><h3>{a.title}</h3><b>{a.when}</b><p>{a.location}</p>{a.carer&&<div className="carer-strip">{a.carer} is taking you</div>}<Button>Get directions</Button></Card>)}</div></AppLayout>}
