@@ -1,0 +1,12 @@
+{
+  "title": "CareConnect",
+  "description": "Everyday care support, shared schedules, notes, contacts, and activity in one calm place.",
+  "language": "en",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
