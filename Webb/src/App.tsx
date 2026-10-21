@@ -40,6 +40,7 @@ const icons = {
 
 type TextSize = "standard" | "large" | "extra-large"
 type Theme = "light" | "dark" | "calm"
+type UserRole = "recipient" | "caregiver"
 
 type Preferences = {
   textSize: TextSize
@@ -53,6 +54,44 @@ type Preferences = {
 }
 
 const PreferencesContext = createContext<Preferences | null>(null)
+
+type Session = {
+  signedIn: boolean
+  role: UserRole | null
+  signIn: () => void
+  selectRole: (role: UserRole) => void
+}
+
+const defaultSession: Session = {
+  signedIn: false,
+  role: null,
+  signIn: () => undefined,
+  selectRole: () => undefined,
+}
+
+const SessionContext = createContext<Session>(defaultSession)
+
+function useSession() {
+  return useContext(SessionContext)
+}
+
+function SessionProvider({ children }: { children: ReactNode }) {
+  const [signedIn, setSignedIn] = useState(false)
+  const [role, setRole] = useState<UserRole | null>(null)
+
+  const signIn = () => {
+    setSignedIn(true)
+    setRole(null)
+  }
+
+  return (
+    <SessionContext.Provider
+      value={{ signedIn, role, signIn, selectRole: setRole }}
+    >
+      {children}
+    </SessionContext.Provider>
+  )
+}
 
 function usePreferences() {
   const context = useContext(PreferencesContext)
@@ -176,6 +215,7 @@ function TextField({
 
 function BrandHeader({ authenticated = false }: { authenticated?: boolean }) {
   const { voiceEnabled, readPage } = usePreferences()
+  const { role } = useSession()
   return (
     <header className="brand-header">
       {authenticated && (
@@ -187,7 +227,11 @@ function BrandHeader({ authenticated = false }: { authenticated?: boolean }) {
       </NavLink>
       {authenticated && (
         <>
-          <span className="brand-header__account">Caregiver · Joyce</span>
+          <span className="brand-header__account">
+            {role === "caregiver"
+              ? "Caregiver · Joyce"
+              : "Care recipient · Margaret"}
+          </span>
           {voiceEnabled && (
             <button className="listen-button" type="button" onClick={readPage}>
               Listen to this page
@@ -205,22 +249,37 @@ function BrandHeader({ authenticated = false }: { authenticated?: boolean }) {
   )
 }
 
-const navItems = [
+const navItems: {
+  to: string
+  label: string
+  icon: string
+  roles?: UserRole[]
+}[] = [
   { to: "/dashboard", label: "Dashboard", icon: icons.dashboard },
-  { to: "/appointments", label: "Appointments", icon: icons.appointments },
+  {
+    to: "/appointments",
+    label: "Appointments",
+    icon: icons.appointments,
+    roles: ["recipient"],
+  },
   { to: "/contacts", label: "Contacts", icon: icons.contacts },
-  { to: "/notes", label: "Notes", icon: icons.notes },
+  { to: "/notes", label: "Care notes", icon: icons.notes },
   { to: "/activity", label: "Activity log", icon: icons.activity },
   {
     to: "/manage-appointments",
     label: "Manage appointments",
     icon: icons.tasks,
+    roles: ["caregiver"],
   },
   { to: "/settings", label: "Settings", icon: icons.settings },
 ]
 
 function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
+  const { role } = useSession()
+  const visibleNavItems = navItems.filter(
+    (item) => !item.roles || (role && item.roles.includes(role)),
+  )
   return (
     <div className="app-frame">
       <BrandHeader authenticated />
@@ -235,7 +294,7 @@ function AppShell({ children }: { children: ReactNode }) {
             <img src={icons.panel} alt="" />
           </button>
           <nav className="sidebar__nav" aria-label="CareConnect">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <NavLink
                 className={({ isActive }) =>
                   `sidebar__link${isActive ? " is-active" : ""}`
@@ -281,6 +340,16 @@ function Card({
 }
 
 function RoleSelection() {
+  const { signedIn, selectRole } = useSession()
+  const navigate = useNavigate()
+
+  if (!signedIn) return <Navigate to="/" replace />
+
+  const chooseRole = (role: UserRole) => {
+    selectRole(role)
+    navigate("/dashboard")
+  }
+
   return (
     <div className="public-page">
       <BrandHeader />
@@ -303,7 +372,7 @@ function RoleSelection() {
             <p>
               View your daily schedule, medicines, memory aids, and contacts.
             </p>
-            <Button to="/dashboard" full>
+            <Button onClick={() => chooseRole("recipient")} full>
               Choose care recipient →
             </Button>
           </Card>
@@ -311,7 +380,7 @@ function RoleSelection() {
             <img className="role-icon" src={icons.caregiver} alt="" />
             <h2>I am the Caregiver</h2>
             <p>Manage the care plan, add shift notes, and track medicines.</p>
-            <Button to="/signin" full>
+            <Button onClick={() => chooseRole("caregiver")} full>
               Choose caregiver →
             </Button>
           </Card>
@@ -387,9 +456,11 @@ function AboutPage() {
 
 function SignInPage() {
   const navigate = useNavigate()
+  const { signIn } = useSession()
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    navigate("/dashboard")
+    signIn()
+    navigate("/roles")
   }
   return (
     <div className="public-page">
@@ -425,7 +496,7 @@ function SignInPage() {
           <Button type="submit" full>
             Sign in
           </Button>
-          <Button kind="secondary" to="/" full>
+          <Button kind="secondary" to="/roles" full>
             Choose a different role
           </Button>
         </form>
@@ -441,13 +512,28 @@ const summary = [
   ["Memory cards", "5 active items"],
 ]
 
+const caregiverSummary = [
+  ["Tasks completed", "2 / 6"],
+  ["Medicines tracked", "3 of 5"],
+  ["Appointments", "2 this week"],
+  ["Notes this week", "3 updates"],
+]
+
 function DashboardPage() {
+  const { role } = useSession()
+  const isCaregiver = role === "caregiver"
+  const dashboardSummary = isCaregiver ? caregiverSummary : summary
+
   return (
     <AppShell>
       <section className="dashboard-banner">
         <p className="eyebrow eyebrow--light">Good morning</p>
-        <h1>Welcome, Margaret</h1>
-        <p>Here is what is happening today.</p>
+        <h1>Welcome, {isCaregiver ? "Joyce" : "Margaret"}</h1>
+        <p>
+          {isCaregiver
+            ? "Here is Margaret’s care overview for today."
+            : "Here is what is happening today."}
+        </p>
       </section>
       <section className="section-block">
         <div className="section-title">
@@ -455,7 +541,7 @@ function DashboardPage() {
           <span>Tuesday, 24 September</span>
         </div>
         <div className="summary-grid">
-          {summary.map(([label, value]) => (
+          {dashboardSummary.map(([label, value]) => (
             <Card key={label}>
               <span>{label}</span>
               <strong>{value}</strong>
@@ -492,14 +578,18 @@ function DashboardPage() {
         </section>
         <section className="section-block quick-links">
           <h2>Quick links</h2>
-          <Button kind="secondary" to="/appointments" full>
-            View appointments
+          <Button
+            kind="secondary"
+            to={isCaregiver ? "/manage-appointments" : "/appointments"}
+            full
+          >
+            {isCaregiver ? "Manage appointments" : "View appointments"}
           </Button>
           <Button kind="secondary" to="/contacts" full>
             Call a contact
           </Button>
           <Button kind="secondary" to="/notes" full>
-            Read caregiver notes
+            {isCaregiver ? "Write a care note" : "Read caregiver notes"}
           </Button>
           <Button kind="secondary" to="/activity" full>
             Full activity log
@@ -661,23 +751,32 @@ const notes = [
 ]
 
 function NotesPage() {
+  const { role } = useSession()
+  const isCaregiver = role === "caregiver"
+
   return (
     <AppShell>
       <PageHeading
         title="Caregiver notes"
-        subtitle="Daily observations for Dorothy’s care team"
+        subtitle={
+          isCaregiver
+            ? "Share daily observations with Margaret’s care team"
+            : "Updates shared by the people supporting you"
+        }
       />
-      <Card className="note-composer">
-        <div>
-          <span className="eyebrow">New note</span>
-          <h2>Share an update with the care team</h2>
-        </div>
-        <TextField
-          label="Note"
-          defaultValue="Margaret had a settled morning."
-        />
-        <Button>Add note</Button>
-      </Card>
+      {isCaregiver && (
+        <Card className="note-composer">
+          <div>
+            <span className="eyebrow">New note</span>
+            <h2>Share an update with the care team</h2>
+          </div>
+          <TextField
+            label="Note"
+            defaultValue="Margaret had a settled morning."
+          />
+          <Button>Add note</Button>
+        </Card>
+      )}
       <div className="note-grid">
         {notes.map(([date, priority, copy, author]) => (
           <Card tone={priority === "Urgent" ? "red" : "white"} key={date}>
@@ -709,11 +808,17 @@ const events = [
 ]
 
 function ActivityPage() {
+  const { role } = useSession()
+
   return (
     <AppShell>
       <PageHeading
         title="Activity log"
-        subtitle="Margaret’s recent actions — medication taken, check-ins, and tasks"
+        subtitle={
+          role === "caregiver"
+            ? "Margaret’s recent medication, check-ins, and completed tasks"
+            : "Your recent medication, check-ins, and completed tasks"
+        }
       />
       <div className="filter-row">
         <Button>All activity</Button>
@@ -946,23 +1051,88 @@ function SettingsPage() {
   )
 }
 
+function ProtectedPage({
+  children,
+  roles,
+}: {
+  children: ReactNode
+  roles?: UserRole[]
+}) {
+  const { signedIn, role } = useSession()
+
+  if (!signedIn) return <Navigate to="/" replace />
+  if (!role) return <Navigate to="/roles" replace />
+  if (roles && !roles.includes(role)) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return children
+}
+
 function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<RoleSelection />} />
+        <Route path="/" element={<SignInPage />} />
+        <Route path="/roles" element={<RoleSelection />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/signin" element={<SignInPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/appointments" element={<AppointmentsPage />} />
-        <Route path="/contacts" element={<ContactsPage />} />
-        <Route path="/notes" element={<NotesPage />} />
-        <Route path="/activity" element={<ActivityPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedPage>
+              <DashboardPage />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedPage roles={["recipient"]}>
+              <AppointmentsPage />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/contacts"
+          element={
+            <ProtectedPage>
+              <ContactsPage />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/notes"
+          element={
+            <ProtectedPage>
+              <NotesPage />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/activity"
+          element={
+            <ProtectedPage>
+              <ActivityPage />
+            </ProtectedPage>
+          }
+        />
         <Route
           path="/manage-appointments"
-          element={<ManageAppointmentsPage />}
+          element={
+            <ProtectedPage roles={["caregiver"]}>
+              <ManageAppointmentsPage />
+            </ProtectedPage>
+          }
         />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedPage>
+              <SettingsPage />
+            </ProtectedPage>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
@@ -972,7 +1142,9 @@ function Router() {
 export default function App() {
   return (
     <PreferencesProvider>
-      <Router />
+      <SessionProvider>
+        <Router />
+      </SessionProvider>
     </PreferencesProvider>
   )
 }

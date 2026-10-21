@@ -1,4 +1,10 @@
-@import 'tailwindcss';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Your existing @font-face rules and @layer statements follow below */
 
 @font-face {
   font-family: 'Inter:Bold';
