@@ -1,5 +1,1 @@
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="calendar-check">
-<path id="Vector" d="M6.66667 1.666V3.3328M6.66667 3.3328V4.9996M6.66667 3.3328H4.16667C3.24619 3.3328 2.5 4.07905 2.5 4.9996V8.3332M6.66667 3.3328H13.3333M13.3333 1.666V3.3328M13.3333 3.3328V4.9996M13.3333 3.3328H15.8333C16.7538 3.3328 17.5 4.07905 17.5 4.9996V8.3332M2.5 8.3332H17.5M2.5 8.3332V16.6672C2.5 17.5877 3.24619 18.334 4.16667 18.334H15.8333C16.7538 18.334 17.5 17.5877 17.5 16.6672V8.3332M7.5 13.3336L9.16667 15.0004L12.5 11.6668" stroke-linecap="round" stroke="#596A7D"/>
-</g>
-</svg>
+<svg preserveAspectRatio="none" overflow="visible" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="calendar-check"><path id="Vector" d="M6.667 1.666V3.333M6.667 3.333V5M6.667 3.333H4.167C3.246 3.333 2.5 4.079 2.5 5V8.333M6.667 3.333H13.333M13.333 1.666V3.333M13.333 3.333V5M13.333 3.333H15.833C16.754 3.333 17.5 4.079 17.5 5V8.333M2.5 8.333H17.5M2.5 8.333V16.667C2.5 17.588 3.246 18.334 4.167 18.334H15.833C16.754 18.334 17.5 17.588 17.5 16.667V8.333M7.5 13.334L9.167 15L12.5 11.667" stroke-linecap="round" stroke="#596A7D"/></g></svg>

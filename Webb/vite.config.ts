@@ -16,6 +16,20 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: emitSourcemaps ? 'inline' : false,
       minify: !emitSourcemaps,
+      rollupOptions: {
+        output: {
+          // Long-lived vendor chunks: they change rarely, so browsers and the
+          // service worker keep them cached across app releases.
+          manualChunks(id: string) {
+            if (!id.includes('node_modules')) return undefined
+            if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'vendor-react'
+            if (/[\\/]node_modules[\\/](react-router|react-router-dom)[\\/]/.test(id)) return 'vendor-router'
+            if (/[\\/]node_modules[\\/](@reduxjs|redux|react-redux|immer|reselect|redux-thunk|use-sync-external-store)[\\/]/.test(id)) return 'vendor-redux'
+            // Anything else stays with the code that imports it (avoids an empty catch-all chunk).
+            return undefined
+          },
+        },
+      },
     },
     plugins: [
 react(),
@@ -40,9 +54,14 @@ react(),
 ],
       },
     },
+    // Production preview gets its own port so it can never be confused with the
+    // dev server on 8443 (Lighthouse must be run here, not on the dev server).
+    // strictPort: fail loudly instead of silently moving to another port.
     preview: {
       host: process.env.FIGMA_DEV_SERVER_HOST || '0.0.0.0',
-      port: parseInt(process.env.PORT || '8443'),
+      port: parseInt(process.env.PREVIEW_PORT || '4173'),
+      strictPort: true,
+      open: '/signin',
     },
   }
 })

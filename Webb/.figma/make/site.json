@@ -1,9 +1,9 @@
 {
-  "title": "CareConnect",
+  "title": "CareConnect – Everyday care support for families and caregivers",
   "description": "Everyday care support, shared schedules, notes, contacts, and activity in one calm place.",
   "language": "en",
   "robots": {
-    "index": false
+    "index": true
   },
   "accessibility": {
     "addBypassLinks": false,

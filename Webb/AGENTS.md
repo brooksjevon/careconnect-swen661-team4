@@ -14,7 +14,8 @@ A Vite development server is **already running** on `$PORT` (default 8443). You 
 This is the canonical project structure. Start with task-relevant files below. Only follow imports or inspect other files when required, when a documented path is missing, or when the repository contradicts this guide.
 
 - `src/main.tsx` - React entrypoint; imports `src/index.css` and mounts `src/App.tsx` into the `#root` element
-- `src/App.tsx` - Primary application component and the usual starting point for UI work
+- `src/App.tsx` - Root component: wraps the router in `PreferencesProvider`
+- `src/routes/router.tsx` - Route tree; pages live in `src/pages/`, layouts in `src/layouts/`, shared UI in `src/components/`, custom hooks in `src/hooks/`, Redux in `src/store/` (see README_IMPLEMENTATION.md)
 - `src/index.css` - Global CSS entrypoint and Tailwind CSS v4 import
 - `index.html` - Vite HTML shell containing the `#root` element and loading `src/main.tsx`
 - `package.json` - Project dependencies and the Vite build, development, preview, and formatting scripts
