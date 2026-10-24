@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareConnect Desktop — Medications</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body class="app-layout">
+
+  <header class="header">
+    <a href="landing.html" class="logo">
+      <span class="logo-icon" aria-hidden="true">💙</span>
+      <span class="logo-text">Care<span class="logo-accent">Connect</span></span>
+    </a>
+    <div class="header-right">
+      <span class="header-date">Tuesday, 24 September · 10:42 am</span>
+      <span class="chip chip-patient">Patient</span>
+      <span class="avatar avatar-patient">M</span>
+      <span class="user-name">Margaret</span>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <aside class="sidebar" aria-label="Main navigation">
+      <nav>
+        <a href="today.html" class="nav-item">Today</a>
+        <a href="medications.html" class="nav-item nav-active">Medications</a>
+        <a href="#" class="nav-item">Schedule</a>
+        <a href="#" class="nav-item">Appointments</a>
+        <a href="#" class="nav-item">Memories</a>
+        <a href="#" class="nav-item">Contacts</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+
+      <div class="page-title-block">
+        <h1 class="page-title">Medicines</h1>
+        <p class="page-subtitle">Today's medication tracker</p>
+      </div>
+
+      <div class="alert alert-warm">
+        <span class="alert-icon" aria-hidden="true">⚠️</span>
+        <span>2 medicines still to take today.</span>
+      </div>
+
+      <section class="section">
+        <h2 class="section-eyebrow">TODAY'S MEDICINES</h2>
+
+        <article class="med-card">
+          <span class="med-swatch med-swatch-calm" aria-hidden="true">💊</span>
+          <div class="med-body">
+            <p class="med-name">Memantine</p>
+            <p class="med-dose">10 mg — 1 tablet</p>
+            <div class="med-times">
+              <span class="pill">8:00 am</span>
+              <span class="pill">8:00 pm</span>
+            </div>
+            <p class="med-note">Take with water.</p>
+          </div>
+          <button class="med-toggle" aria-label="Mark Memantine as taken">○</button>
+        </article>
+
+        <article class="med-card">
+          <span class="med-swatch med-swatch-warm" aria-hidden="true">💊</span>
+          <div class="med-body">
+            <p class="med-name">Vitamin D3</p>
+            <p class="med-dose">1000 IU — 1 capsule</p>
+            <div class="med-times">
+              <span class="pill">8:30 am</span>
+            </div>
+            <p class="med-note">Take with breakfast.</p>
+          </div>
+          <button class="med-toggle" aria-label="Mark Vitamin D3 as taken">○</button>
+        </article>
+
+        <article class="med-card med-card-done">
+          <span class="med-swatch med-swatch-calm" aria-hidden="true">💊</span>
+          <div class="med-body">
+            <p class="med-name med-name-done">Amlodipine</p>
+            <p class="med-dose">5 mg — 1 tablet</p>
+            <div class="med-times">
+              <span class="pill">12:00 pm</span>
+            </div>
+          </div>
+          <button class="med-toggle med-toggle-done" aria-label="Amlodipine already taken">✓</button>
+        </article>
+
+        <article class="med-card">
+          <span class="med-swatch med-swatch-success" aria-hidden="true">💊</span>
+          <div class="med-body">
+            <p class="med-name">Paracetamol</p>
+            <p class="med-dose">500 mg — only if needed</p>
+            <div class="med-times">
+              <span class="pill pill-neutral">As needed</span>
+            </div>
+          </div>
+          <button class="med-toggle" aria-label="Mark Paracetamol as taken">○</button>
+        </article>
+      </section>
+
+      <p class="footer-note">Always take medicines as prescribed by your doctor. If unsure, ask your carer.</p>
+
+    </main>
+  </div>
+
+</body>
+</html>

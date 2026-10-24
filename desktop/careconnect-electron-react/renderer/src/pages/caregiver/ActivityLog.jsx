@@ -1,0 +1,5 @@
+import AppLayout from '../../layouts/AppLayout'
+import { Card, PageTitle, Badge, Button, SectionLabel } from '../../components/UI'
+import { activities } from '../../data/mockData'
+const EventList=({items})=><Card className="activity-card">{items.map(a=><div className="activity-row" key={a[0]}><div><b>{a[0]}</b><small>{a[1]}</small></div><span>{a[2]}</span></div>)}</Card>
+export default function ActivityLog(){return <AppLayout role="caregiver"><PageTitle title="📊 Activity log" subtitle="Margaret's recent actions — medications taken, check-ins, and tasks" action={<Button>↻ Refresh</Button>}/><div className="legend"><Badge tone="green">● Medication taken</Badge><Badge tone="amber">● Medication unmarked</Badge><Badge>● Task completed</Badge><Badge tone="green">● Checked in</Badge></div><div className="two-col"><div><SectionLabel>TODAY — 5 events</SectionLabel><EventList items={activities}/><SectionLabel>MONDAY, 22 SEPTEMBER</SectionLabel><EventList items={activities.slice(0,3)}/></div><div><SectionLabel>YESTERDAY — 4 events</SectionLabel><EventList items={activities.slice(0,4)}/></div></div></AppLayout>}

@@ -1,367 +1,626 @@
-CareConnect
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-build-646CFF?logo=vite&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
-![WCAG 2.1 AA](https://img.shields.io/badge/WCAG-2.1%20AA-success)
-![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8)
-A responsive, accessible medical companion web application for care recipients (patients) living with short-term memory loss and their caregivers. Built React-first as an installable Progressive Web App with WCAG 2.1 Level AA accessibility engineered into every screen.
+# SWEN 661 — Team 4 — Week 6 Accessibility and Testing
 
-> Developed as a course artifact for **SWEN 661 — UI Implementation** (Assignment 10: Web Design & Early Implementation).
+## Project Description
 
----
+CareConnect is a daily companion application designed to help care recipients and caregivers stay organized, manage healthcare activities, and remain connected throughout the day.
 
-Table of contents
-About
-Who it's for
-Key features
-Accessibility
-Tech stack
-Project structure
-Application flow
-Getting started
-Available scripts
-Screens & walkthrough
-Testing
-Deployment
-Roadmap
-Authors
-License
-Acknowledgments
-Disclaimer
+For Week 6, the CareConnect project combines the existing Flutter and React Native mobile implementations with accessibility improvements, automated accessibility testing, integration testing, end-to-end testing, and updated code coverage.
+
+The repository contains two mobile implementations:
+
+    mobile/careconnect_flutter/
+    mobile/careconnect_react_native/
+
+The Week 6 work focuses on WCAG 2.1 Level AA accessibility requirements and validation of critical CareConnect workflows.
+
+Major feature areas include:
+
+- Authentication and role selection
+- Home dashboard
+- Medications
+- Appointments
+- Appointment preparation
+- Care Plan
+- Schedule and reminders
+- My Health
+- Accessibility settings
+- Accessible navigation and controls
 
 ---
 
-About
-CareConnect lowers the daily cognitive load for people who need help remembering, while giving caregivers clear visibility and control over medications and appointments. The patient experience is built around recognition over recall: a persistent orientation bar (who you are, the day and time, where you are), one primary task per screen, always-visible and timestamped medication status, and an undo path on every action. The caregiver experience is a denser dashboard for managing schedules and monitoring adherence.
-The two experiences share a single accessible component library and design-token system, so behavior and styling stay consistent across the app.
-Who it's for
-Care recipients (patients) with short-term memory loss — calm, low-clutter screens, large targets, plain language, and no time pressure.
-Caregivers — an information-rich dashboard with adherence tracking, alerts, and full schedule management.
-Key features
-Patient
-Today home with a prominent "Next thing to do" card and the day's remaining items.
-Medications with pill images, plain-language doses, always-visible status, and a 10-second undo on every dose.
-Appointments in chronological order with full-word dates, locations, and "who is taking me."
-A persistent "Call my caregiver" action on every patient screen.
-Caregiver
-Dashboard with adherence summary, an alerts region for missed/overdue items, and a recent-activity timeline.
-Manage medications and manage appointments with accessible create/edit forms, inline validation, and delete confirmation.
-All caregiver edits propagate to the patient screens.
-Shared
-Public landing page with an accessible, scoped AI assistant (explains the app and guides sign in/up; never gives medical advice).
-Installable PWA with offline access to the day's schedule.
-Accessibility
-CareConnect is designed and verified against 21 WCAG 2.1 A/AA success criteria, with full conformance mapping in `ACCESSIBILITY.md`.
-Highlights: 4.5:1 text contrast, full keyboard operability, visible focus indicators, semantic landmarks, ARIA live regions (`role="status"` / `role="alert"`), 44x44px minimum targets, 320px reflow with no horizontal scroll, and `prefers-reduced-motion` support.
-Tech stack
-Layer Technology
-Framework React 18 + Vite
-Language TypeScript (strict)
-Styling Tailwind CSS with accessibility-first design tokens
-Routing React Router (protected routes)
-State / persistence React Context + `localStorage` (mock data)
-AI assistant Anthropic API via a serverless/edge function
-PWA Web App Manifest + Service Worker
-Testing Jest + React Testing Library + Playwright (E2E)
+# Project Structure
+
+The primary Week 6 mobile project structure is:
+
+    mobile/
+    ├── careconnect_flutter/
+    │   ├── integration_test/
+    │   ├── lib/
+    │   ├── test/
+    │   ├── README.md
+    │   └── pubspec.yaml
+    │
+    └── careconnect_react_native/
+        ├── .maestro/
+        ├── __tests__/
+        ├── src/
+        ├── App.tsx
+        ├── app.json
+        ├── jest.setup.js
+        ├── package.json
+        └── tsconfig.json
+
+The Flutter-specific accessibility and testing documentation is available at:
+
+    mobile/careconnect_flutter/README.md
 
 ---
 
-Project structure
+# Part 1 — Flutter Accessibility Implementation
 
-```
-careconnect/
-├── public/
-│   ├── icons/                       # PWA maskable icons
-│   ├── manifest.webmanifest         # PWA manifest
-│   └── favicon.svg
-├── docs/
-│   └── screenshots/                 # README images (01-landing.png … 14-caregiver-activity.png)
-├── scripts/
-│   └── screenshots.ts               # Playwright screenshot automation
-├── api/
-│   └── assistant.ts                 # serverless function — Anthropic API proxy (key stays server-side)
-├── src/
-│   ├── components/                  # Accessible component library
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── BigActionTile.tsx
-│   │   ├── Field.tsx
-│   │   ├── Banner.tsx
-│   │   └── ConfirmDialog.tsx
-│   ├── context/
-│   │   ├── AuthContext.tsx          # mock auth, persisted to localStorage
-│   │   └── RoleContext.tsx          # role + current patient profile
-│   ├── shell/
-│   │   ├── AppShell.tsx             # layout + semantic landmarks
-│   │   ├── OrientationBar.tsx       # persistent date/time/greeting/"you are here"
-│   │   ├── Navigation.tsx           # bottom nav (patient) / sidebar (caregiver)
-│   │   └── ProtectedRoute.tsx       # redirects unauthenticated users
-│   ├── pages/
-│   │   ├── landing/
-│   │   │   ├── LandingPage.tsx
-│   │   │   ├── SignIn.tsx
-│   │   │   ├── SignUp.tsx
-│   │   │   └── Assistant.tsx        # accessible AI chatbot
-│   │   ├── RoleChooser.tsx
-│   │   ├── patient/
-│   │   │   ├── Today.tsx
-│   │   │   ├── Medications.tsx
-│   │   │   └── Appointments.tsx
-│   │   └── caregiver/
-│   │       ├── Dashboard.tsx
-│   │       ├── ManageMedications.tsx
-│   │       ├── ManageAppointments.tsx
-│   │       └── Activity.tsx
-│   ├── data/
-│   │   └── mockData.ts              # seed medications & appointments
-│   ├── lib/
-│   │   └── storage.ts               # localStorage helpers
-│   ├── styles/
-│   │   └── tokens.css               # design tokens + global focus styles
-│   ├── App.tsx                      # route definitions
-│   ├── main.tsx                     # app entry
-│   └── serviceWorker.ts             # PWA offline caching
-├── .env                             # local secrets (gitignored — never commit)
-├── .env.example                     # placeholder environment variables
-├── .gitignore
-├── ACCESSIBILITY.md                 # WCAG 2.1 AA conformance mapping
-├── LICENSE                          # MIT
-├── README.md
-├── index.html
-├── package.json
-├── tailwind.config.js
-├── tsconfig.json
-└── vite.config.ts
-```
+The Flutter implementation includes accessibility improvements intended to support WCAG 2.1 Level AA requirements.
 
-> The tree above reflects the intended architecture. To regenerate the exact tree from your machine, run `tree -I "node_modules|dist" -L 3` (install `tree` if needed) or copy the structure from the VS Code Explorer.
-> Application flow
+Accessibility work includes:
 
-```mermaid
-flowchart TD
-    A[Landing page] -->|Sign up / Sign in| B{Authenticated?}
-    B -->|No| A
-    B -->|Yes, first time| C[Role chooser]
-    C -->|Care recipient| D[Patient: Today / Medications / Appointments]
-    C -->|Caregiver| E[Caregiver: Dashboard / Manage / Activity]
-    B -->|Yes, returning| F[Stored role -> straight to home]
-    F --> D
-    F --> E
-    E -. edits schedule .-> D
-```
+- Flutter Semantics support
+- Meaningful labels for interactive controls
+- Accessible buttons and navigation elements
+- Mobile touch-target considerations
+- Text contrast testing
+- Text-scaling considerations
+- Logical navigation and focus considerations
+- Screen-reader compatibility considerations
+
+Flutter accessibility testing uses the framework's built-in accessibility guideline matchers.
+
+The dedicated test file is:
+
+    mobile/careconnect_flutter/test/accessibility_guidelines_test.dart
+
+The automated accessibility tests evaluate:
+
+- Labeled tap targets
+- Android tap-target sizing
+- iOS tap-target sizing
+- Text contrast
+
+The Flutter guideline APIs used include:
+
+    labeledTapTargetGuideline
+    androidTapTargetGuideline
+    iOSTapTargetGuideline
+    textContrastGuideline
+
+Verified result:
+
+    4/4 Flutter accessibility guideline tests passed
 
 ---
 
-Getting started
-Prerequisites
-Node.js 18+ and npm
-A modern browser
-(Optional) An Anthropic API key for the landing-page assistant
-Get the code
-Clone with Git (HTTPS):
+# Part 2 — React Native Accessibility Implementation
 
-```bash
-git clone https://github.com/aliminagar/careconnect-swen661.git
-cd careconnect-swen661
-```
+The React Native implementation uses Expo, TypeScript, React Navigation, and React Native accessibility APIs.
 
-Clone with SSH:
+Accessibility features include:
 
-```bash
-git clone git@github.com:aliminagar/careconnect-swen661.git
-cd careconnect-swen661
-```
+- Accessible labels
+- Accessibility roles
+- Accessibility states
+- Accessibility hints where applicable
+- Adjustable text size
+- Wider text spacing
+- Multiple visual themes
+- Read-aloud assistance
+- Accessible reusable cards and controls
+- Accessibility-focused navigation
 
-Clone with GitHub CLI:
+The React Native application contains a dedicated Accessibility screen where users can configure reading and visual preferences.
 
-```bash
-gh repo clone aliminagar/careconnect-swen661
-cd careconnect-swen661
-```
+Reusable accessibility-related components include:
 
-Download without Git: on the GitHub repo page, click Code → Download ZIP, then unzip and open the folder.
-Install and configure
+    AccessibleCard
+    ReadAloudButton
+    ThemedScreen
+    ThemeBackground
 
-```bash
-npm install
-cp .env.example .env     # then fill in your values
-```
+Read-aloud functionality is implemented using:
 
-`.env` variables:
+    expo-speech
 
-```
-VITE_SUPABASE_URL=your_supabase_url            # only if using Supabase
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key  # public/anon key (protected by RLS)
-# Server-side only — NEVER prefix with VITE_:
-ANTHROPIC_API_KEY=your_anthropic_key           # used by api/assistant.ts
-```
+Global accessibility preferences are maintained through:
 
-> The app runs on mock `localStorage` data without any backend keys. If the Anthropic key is absent, the assistant falls back to a scripted guided helper.
-> Run
+    src/context/AppContext.tsx
 
-```bash
-npm run dev      # http://localhost:5173
-```
-
-Publish your own copy to GitHub
-If the project isn't on GitHub yet:
-
-```bash
-git init
-git add .
-git commit -m "Initial commit: CareConnect"
-git branch -M main
-git remote add origin https://github.com/aliminagar/careconnect-swen661.git
-git push -u origin main
-```
-
-> Confirm `.env` is listed in `.gitignore` before your first push so secrets never reach the repo.
+These settings include application theme, text scale, wider text spacing, and read-aloud preferences.
 
 ---
 
-Available scripts
-Script Description
-`npm run dev` Start the Vite dev server
-`npm run build` Production build to `/dist`
-`npm run preview` Preview the production build locally
-`npm test` Run Jest + React Testing Library unit/component tests
-`npm run screenshots` Generate README screenshots via Playwright
+# React Native Project Location
+
+From the repository root:
+
+    cd mobile/careconnect_react_native
+
+Install dependencies:
+
+    npm install
+
+Start Expo:
+
+    npm start
+
+The application can also be started directly for a supported platform.
+
+Android:
+
+    npm run android
+
+iOS:
+
+    npm run ios
+
+Web:
+
+    npm run web
 
 ---
 
-Screens & walkthrough
+# Flutter Project Location
 
-> **Capturing screenshots:** run `npm run dev`, then `npm run screenshots` (Playwright), or capture manually with your OS tool. Images live in `docs/screenshots/` and are embedded below.
+From the repository root:
 
-### 1. Landing page
+    cd mobile/careconnect_flutter
 
-Public entry: hero, "How it helps" cards, privacy reassurance, Sign up / Sign in CTAs.
+Install Flutter dependencies:
 
-![Landing page](docs/screenshots/01-landing.png)
+    flutter pub get
 
-### 2. AI assistant
+View available devices:
 
-Accessible chatbot panel (aria-live, focus management) scoped to onboarding — no medical advice.
+    flutter devices
 
-![AI assistant panel](docs/screenshots/02-assistant.png)
+Run the application:
 
-### 3. Sign up
+    flutter run -d <device-id>
 
-Accessible registration form with visible labels and inline validation.
+For example:
 
-![Sign up form](docs/screenshots/03-signup.png)
-
-### 4. Sign in
-
-Mock auth with the same accessible form pattern.
-
-![Sign in form](docs/screenshots/04-signin.png)
-
-### 5. Role chooser
-
-Post sign-in choice between Care Recipient and Caregiver; persists for future logins.
-
-![Role chooser](docs/screenshots/05-role-chooser.png)
-
-### 6. Patient — Today
-
-Calm home with "Next thing to do" and the day's remaining items.
-
-![Patient Today home](docs/screenshots/06-patient-today.png)
-
-### 7. Patient — Medications
-
-Pill images, plain-language doses, always-visible status.
-
-![Patient medications list](docs/screenshots/07-patient-medications.png)
-
-### 8. Medication taken
-
-Polite confirmation plus a 10-second undo.
-
-![Medication marked as taken](docs/screenshots/08-medication-taken.png)
-
-### 9. Patient — Appointments
-
-Chronological appointments with full-word dates and directions.
-
-![Patient appointments](docs/screenshots/09-patient-appointments.png)
-
-### 10. Caregiver — Dashboard
-
-Adherence summary, alerts region, recent activity.
-
-![Caregiver dashboard](docs/screenshots/10-caregiver-dashboard.png)
-
-### 11. Caregiver — Manage medications
-
-Medication list with edit and confirm-on-delete.
-
-![Caregiver manage medications](docs/screenshots/11-caregiver-medications.png)
-
-### 12. Caregiver — Medication form
-
-Accessible add/edit form with full validation.
-
-![Caregiver medication form](docs/screenshots/12-caregiver-medication-form.png)
-
-### 13. Caregiver — Appointments
-
-Appointment list and accessible add/edit form.
-
-![Caregiver manage appointments](docs/screenshots/13-caregiver-appointments.png)
-
-### 14. Caregiver — Activity
-
-Timestamped log of taken/skipped doses and check-ins.
-
-![Caregiver activity log](docs/screenshots/14-caregiver-activity.png)
+    flutter run -d chrome
 
 ---
 
-Testing
-Unit & component: Jest + React Testing Library (`npm test`), targeting 60–75% coverage per the course milestones.
-End-to-end: Playwright specs for core flows (sign in → take medication → caregiver sees adherence).
-Accessibility: axe DevTools, Lighthouse (target 95+ accessibility), and manual screen-reader testing (NVDA / VoiceOver) plus keyboard-only navigation.
-Deployment
+# Automated Testing
 
-```bash
-npm run build       # outputs to /dist
-```
+## Flutter Tests
 
-Deploy `/dist` to Netlify or Vercel. Configure the assistant's serverless function and set `ANTHROPIC_API_KEY` in the host's environment settings (never client-side).
-Roadmap
-Real backend with Supabase + Row Level Security
-Multi-patient support for caregivers
-Push-notification medication reminders
-Localization / bilingual support
+From:
+
+    mobile/careconnect_flutter/
+
+run:
+
+    flutter test
+
+Verified Week 6 result:
+
+    26 tests passed
+    0 tests failed
+
+The complete suite includes unit, widget, workflow, and accessibility-focused testing.
+
+To run only the Flutter accessibility guideline tests:
+
+    flutter test test/accessibility_guidelines_test.dart
+
+Verified result:
+
+    4 accessibility guideline tests passed
 
 ---
 
-Authors
-Alireza Minagar — Author & Developer
-AI/ML Software Engineer · Founder & CTO, Perfect Strokes LLC · Adjunct Professor, UMGC.
-Physician-scientist turned software engineer, with graduate work in Bioinformatics, Software Engineering, and Cybersecurity, focused on the intersection of healthcare and applied AI/ML.
-GitHub: `https://github.com/aliminagar`
-LinkedIn: `https://www.linkedin.com/in/alireza-minagar-ai`
-Website: `https://alirezaminagar-md.netlify.app/`
-Additional contributors (SWEN 661 team), if applicable:
-`Name` — role
-`Name` — role
+## React Native Tests
 
-> Replace the placeholder links and add team members as needed.
-> License
-> Distributed under the MIT License. See `LICENSE` for full text.
+From:
 
-```
-Copyright (c) 2026 Alireza Minagar / Perfect Strokes LLC
-```
+    mobile/careconnect_react_native/
 
-> MIT is permissive and ideal for a portfolio/course project. If you prefer an explicit patent grant use **Apache-2.0**; if you want copyleft (derivatives must stay open) use **GPL-3.0**. Tell me and I'll swap the LICENSE file.
-> Acknowledgments
-> University of Maryland Global Campus — SWEN 661 (UI Implementation)
-> The WCAG 2.1 guidelines and the WAI-ARIA Authoring Practices
-> Initial scaffolding accelerated with Bolt.new; completed and hardened locally
-> Disclaimer
-> CareConnect is an educational prototype built as a course artifact. It is not a medical device, provides no medical, dosage, or clinical advice, and must not be used for real patient care or to manage actual medications. It uses mock data only and is not intended to store real protected health information (PHI). For any real health decision, consult a licensed clinician.
+run:
+
+    npm test
+
+The React Native test suite uses:
+
+- Jest
+- React Native Testing Library
+- jest-expo
+
+Verified Week 6 result:
+
+    4 test suites passed
+    30 tests passed
+    0 tests failed
+
+The React Native tests cover application behavior and accessibility-related functionality including:
+
+- Sign-in behavior
+- Role selection
+- Home dashboard content
+- Medication workflows
+- Appointment workflows
+- Care Plan behavior
+- Schedule behavior
+- Health information
+- Accessibility settings
+- Accessible components
+- Read-aloud functionality
+- Integration behavior
+
+---
+
+# TypeScript Validation
+
+The React Native implementation uses TypeScript.
+
+Run TypeScript validation with:
+
+    npx tsc --noEmit
+
+Verified Week 6 result:
+
+    TypeScript validation passed
+
+---
+
+# Integration Testing
+
+## Flutter Integration Test
+
+The Flutter integration test is located at:
+
+    mobile/careconnect_flutter/integration_test/appointment_flow_test.dart
+
+The test validates the appointment preparation workflow.
+
+It verifies that a user can:
+
+1. Navigate to Appointments
+2. Open appointment preparation
+3. Review the preparation workflow
+4. Mark preparation complete
+5. Verify the completed state
+
+Run the test with:
+
+    flutter test integration_test/appointment_flow_test.dart -d macos
+
+Verified Week 6 result:
+
+    1 integration test passed
+
+---
+
+## React Native Integration Test
+
+The React Native integration test is located at:
+
+    mobile/careconnect_react_native/__tests__/integration.test.tsx
+
+The integration test validates shared application behavior across the sign-in and medication workflow.
+
+The test verifies that a patient can sign in, access medication information, mark Lisinopril as taken, and observe the updated medication state.
+
+The integration test is included when running:
+
+    npm test
+
+Verified Week 6 result:
+
+    React Native integration test passed
+
+---
+
+# End-to-End Testing with Maestro
+
+Maestro is used for React Native end-to-end testing.
+
+The Maestro flows are located at:
+
+    mobile/careconnect_react_native/.maestro/
+
+The Week 6 E2E flows are:
+
+    patient-sign-in.yaml
+    medication-workflow.yaml
+    accessibility-settings.yaml
+
+These provide three critical workflow tests.
+
+---
+
+## Patient Sign-In Flow
+
+File:
+
+    .maestro/patient-sign-in.yaml
+
+This flow exercises the patient authentication interface and verifies that the user can progress beyond the sign-in screen.
+
+The test uses accessible control information when interacting with the authentication interface.
+
+---
+
+## Medication Workflow
+
+File:
+
+    .maestro/medication-workflow.yaml
+
+This flow verifies the medication completion workflow.
+
+It checks for the Lisinopril medication, activates the accessible medication completion control, and verifies the Taken Today state.
+
+---
+
+## Accessibility Settings Flow
+
+File:
+
+    .maestro/accessibility-settings.yaml
+
+This accessibility-focused E2E flow verifies the dedicated Accessibility interface.
+
+The test checks accessibility-related content and uses accessibility labels to interact with theme controls.
+
+The flow verifies elements including:
+
+- Accessibility
+- Appearance Theme
+- Read Accessibility Page Aloud
+- Neutral theme
+- Blue & Green theme
+- Text Size
+
+Verified Week 6 result:
+
+    Accessibility-focused Maestro flow passed
+
+---
+
+## Running Maestro Tests
+
+From the React Native application directory:
+
+    cd mobile/careconnect_react_native
+
+With the appropriate Android emulator and Expo application running, an individual flow can be executed with:
+
+    maestro test .maestro/patient-sign-in.yaml
+
+    maestro test .maestro/medication-workflow.yaml
+
+    maestro test .maestro/accessibility-settings.yaml
+
+The flows may require the application to be placed in the appropriate starting state before execution.
+
+For example:
+
+- The patient sign-in flow begins from the sign-in interface.
+- The medication workflow begins from the authenticated medication interface with the medication available to be marked as taken.
+- The accessibility settings flow begins from the authenticated Accessibility interface.
+
+These preconditions should be established before executing the corresponding flow.
+
+---
+
+# Code Coverage
+
+## Flutter Coverage
+
+Generate Flutter coverage with:
+
+    flutter test --coverage
+
+View the LCOV summary with:
+
+    lcov --summary coverage/lcov.info
+
+Verified Week 6 Flutter coverage:
+
+    Source files: 22
+    Covered lines: 933 of 1156
+    Line coverage: 80.7%
+
+The required coverage threshold is at least 60%.
+
+Flutter exceeds the required threshold.
+
+To generate the HTML report:
+
+    genhtml coverage/lcov.info -o coverage/html
+
+Open it on macOS with:
+
+    open coverage/html/index.html
+
+---
+
+## React Native Coverage
+
+Run the React Native tests and coverage workflow with:
+
+    npm test
+
+Verified Week 6 React Native coverage:
+
+    Statements: 92.74%
+    Branches:   80.46%
+    Functions:  93.54%
+    Lines:      92.74%
+
+The required coverage threshold is at least 60%.
+
+React Native exceeds the required threshold.
+
+The generated HTML coverage report is located at:
+
+    mobile/careconnect_react_native/coverage/lcov-report/index.html
+
+From the React Native project directory, open it on macOS with:
+
+    open coverage/lcov-report/index.html
+
+---
+
+# Week 6 Coverage Summary
+
+| Platform | Line Coverage | Requirement | Status |
+| --- | ---: | ---: | --- |
+| Flutter | 80.7% | 60% | Meets requirement |
+| React Native | 92.74% | 60% | Meets requirement |
+
+Both implementations currently exceed the Week 6 automated test coverage requirement.
+
+---
+
+# Screen Reader Testing
+
+Week 6 requires manual testing with platform screen readers.
+
+Required environments include:
+
+### Android
+
+- TalkBack
+
+### iOS
+
+- VoiceOver
+
+Screen-reader testing should verify:
+
+- Interactive controls are announced
+- Controls have meaningful labels
+- Navigation order is understandable
+- Buttons communicate their purpose
+- Application content can be discovered without relying exclusively on visual presentation
+- Critical workflows remain usable with the screen reader enabled
+
+A 2–3 minute screen-reader demonstration should be recorded for the required platform testing.
+
+Manual TalkBack and VoiceOver testing and the associated recordings should be documented after the tests are completed.
+
+Automated accessibility testing supplements but does not replace manual screen-reader testing.
+
+---
+
+# WCAG 2.1 Level AA Accessibility Targets
+
+The Week 6 implementation and testing address accessibility areas including:
+
+- Meaningful accessible labels
+- Semantic identification of controls
+- Logical navigation
+- Color contrast
+- Touch-target sizing
+- Text scaling
+- Keyboard and assistive navigation considerations
+- Screen-reader compatibility
+
+Target contrast requirements include:
+
+- 4.5:1 for normal text
+- 3:1 for large text
+
+Target touch sizes include:
+
+- Flutter / Android: 48 x 48 logical pixels
+- iOS: 44 x 44 points
+
+The assignment also requires support for text scaling up to 200%.
+
+Automated testing results should not be interpreted by themselves as proof of complete WCAG 2.1 Level AA conformance across every application screen and state. Manual accessibility verification remains part of the final validation process.
+
+---
+
+# Building the Flutter APK
+
+From:
+
+    mobile/careconnect_flutter/
+
+run:
+
+    flutter build apk --release
+
+The generated release APK is normally located at:
+
+    build/app/outputs/flutter-apk/app-release.apk
+
+The integrated Week 6 branch should be used when generating the final submission build.
+
+---
+
+# Known Issues and Limitations
+
+- CareConnect currently focuses primarily on mobile interface and workflow behavior.
+- The applications are not currently synchronized with a shared production backend.
+- Authentication demonstrates the CareConnect role and sign-in workflow rather than a production authentication service.
+- Application data is primarily local demonstration data.
+- Platform-specific accessibility behavior can vary between physical devices, emulators, and simulators.
+- Automated accessibility testing does not replace TalkBack and VoiceOver testing.
+- Increased text scaling should be manually verified across critical workflows.
+- Keyboard and assistive navigation should be manually verified on supported platforms.
+- Maestro flows have starting-state preconditions that should be established before execution.
+
+---
+
+# Week 6 Verification Summary
+
+Verified automated results currently include:
+
+| Verification | Result |
+| --- | --- |
+| Flutter complete test suite | 26/26 passed |
+| Flutter accessibility guideline tests | 4/4 passed |
+| Flutter integration test | Passed |
+| Flutter line coverage | 80.7% |
+| React Native test suites | 4/4 passed |
+| React Native tests | 30/30 passed |
+| React Native integration test | Passed |
+| React Native line coverage | 92.74% |
+| React Native TypeScript validation | Passed |
+| Maestro patient sign-in workflow | Tested |
+| Maestro medication workflow | Passed |
+| Maestro accessibility settings workflow | Passed |
+
+Remaining manual submission evidence includes the required TalkBack and VoiceOver verification, screen-reader recordings, final accessibility documentation, and final submission artifacts.
+
+---
+
+# Team Member Contributions
+
+| Team Member | Contribution |
+| --- | --- |
+| Matthew Spano | [Part 1] |
+| Stephane Aloys Tekam Nwafor | [Part 2] |
+| Jevon Brooks | [Part 3 & 4] |
+
+---
+
+# AI Usage Summary
+
+AI assistance was used to support development, testing, troubleshooting, accessibility review, and project documentation.
+
+AI-assisted activities included:
+
+- Reviewing Flutter and React Native project structure
+- Supporting accessibility implementation and review
+- Assisting with Flutter accessibility guideline testing
+- Supporting Jest and React Native Testing Library configuration
+- Supporting Flutter and React Native integration testing
+- Assisting with Maestro E2E testing and troubleshooting
+- Reviewing test coverage configuration and results
+- Supporting TypeScript validation
+- Assisting with Week 6 documentation
+
+AI-assisted suggestions were reviewed and executed within the project environment before inclusion in the submission.
