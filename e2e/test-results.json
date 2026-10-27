@@ -1,0 +1,26 @@
+{
+  "application": "https://careconnect-week11.vercel.app",
+  "results": [
+    {
+      "test": "chromium-recipient-dashboard",
+      "status": "PASS"
+    },
+    {
+      "test": "webkit-recipient-dashboard",
+      "status": "PASS"
+    },
+    {
+      "test": "chromium-caregiver-dashboard",
+      "status": "PASS"
+    },
+    {
+      "test": "chromium-appointments",
+      "status": "PASS"
+    },
+    {
+      "test": "chromium-care-notes",
+      "status": "PASS"
+    }
+  ],
+  "firefox": "BLOCKED: Playwright Firefox launch timeout on macOS"
+}
