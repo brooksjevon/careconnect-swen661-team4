@@ -1,0 +1,16 @@
+appId: host.exp.exponent
+---
+- assertVisible: "Accessibility"
+- assertVisible: "Appearance Theme"
+- assertVisible: "Read Accessibility Page Aloud"
+
+- assertVisible:
+    label: "Neutral theme"
+
+- tapOn:
+    label: "Blue & Green theme"
+
+- assertVisible:
+    label: "Blue & Green theme"
+
+- assertVisible: "Text Size"

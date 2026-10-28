@@ -1,0 +1,9 @@
+appId: host.exp.exponent
+---
+- assertVisible: "Medications"
+- assertVisible: "Lisinopril - 10 mg"
+- assertVisible: "Mark Lisinopril as taken"
+
+- tapOn: "Mark Lisinopril as taken"
+
+- assertVisible: "Taken Today"

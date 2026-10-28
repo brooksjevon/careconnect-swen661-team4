@@ -1,0 +1,19 @@
+appId: host.exp.exponent
+---
+- assertVisible: "CareConnect"
+- assertVisible: "Email"
+- assertVisible: "Password"
+- assertVisible: "Sign in as Patient"
+
+- tapOn: "Email"
+- waitForAnimationToEnd
+- inputText: "patient@careconnect.com"
+
+- tapOn: "Password"
+- waitForAnimationToEnd
+- inputText: "test123"
+
+- hideKeyboard
+- tapOn: "Sign in as Patient"
+
+- assertNotVisible: "Sign in as Patient"
