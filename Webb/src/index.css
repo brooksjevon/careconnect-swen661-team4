@@ -1,9 +1,9 @@
 
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
 
-
+@import "tailwindcss";
 /* Your existing @font-face rules and @layer statements follow below */
 
 @font-face {
